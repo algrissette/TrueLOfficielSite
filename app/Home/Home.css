@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+
+.grid-item{
+     @supports (animation-timeline: scroll()) {
+      @media (prefers-reduced-motion: no-preference) {
+        animation: zoom-in linear both;
+        animation-timeline: scroll(root block);
+        will-change: transform, opacity, filter;
+      }
+}
+}
