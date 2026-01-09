@@ -134,7 +134,7 @@ export default function Home() {
 
 
             <div className=" imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] sm:hidden md:block "> 
-                <div className="  flex justify-between items-start">
+                <div className=" sm:flex-col md:flex-row flex justify-between items-start">
                     <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black"> 
                  <img  className=" w-full object-cover " src="/Media/Images/Home/HomeImage1.jpg" alt="Home" />
                  </div>
@@ -153,7 +153,7 @@ export default function Home() {
              <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black ">
                   <img  ref={image2} className="w-full object-fit" src="/Media/Images/Home/HomeImage4.jpg" alt="Home" />
                    </div>
-                    <div  className="w-2 h-210 relative bottom-3 rounded-full bg-[#B2BEB5] border-1 border-[#B2BEB5] shadow-lg z-1"> </div>
+                    <div  className="w-2 h-210 relative bottom-3 rounded-full bg-white  shadow-lg z-1"> </div>
 
                    </div>
 
