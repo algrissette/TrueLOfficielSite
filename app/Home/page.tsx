@@ -4,6 +4,7 @@ import {useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import NavBar from "@/components/navbar/navbar";
+import Footer from "@/components/footer/footer";
 
 export default function Home() {
 
@@ -132,24 +133,24 @@ export default function Home() {
                 />
 
 
-            <div className=" imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%]  "> 
-                <div className="  flex justify-between">
-                    <div className="w-[800px] h-[800px] relative overflow-hidden border-6 border-black"> 
-                 <img  className=" w-full object-fit " src="/Media/Images/Home/HomeImage1.jpg" alt="Home" />
+            <div className=" imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] sm:hidden md:block "> 
+                <div className="  flex justify-between items-start">
+                    <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black"> 
+                 <img  className=" w-full object-cover " src="/Media/Images/Home/HomeImage1.jpg" alt="Home" />
                  </div>
                  
-                 <div className="w-[800px] h-[800px] border-6 border-black overflow-hidden ">
-                  <img className=" w-full object-fit " src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
+                 <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black ">
+                  <img className=" w-full object-cover " src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
                    </div>
                   <div ref={animationBar} className="w-2 h-210 relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[46B8FF] shadow-lg z-1"> </div>
 
                         
              </div>
-             <div className="flex relative top-[-840px] justify-between  " > 
-             <div id="Image-Dupe-1" className="border-6 border-black w-[800px] h-[800px] relative overflow-hidden"> 
+             <div className="flex relative top-[-840px] justify-between items-start  " > 
+             <div id="Image-Dupe-1" className="aspect-square w-[40%] relative overflow-hidden border-6 border-black"> 
                  <img ref={image1} className="  w-full object-fit " src="/Media/Images/Home/HomeImage3.jpg" alt="Home" />
                  </div>
-             <div className="w-[800px] h-[800px] border-6 border-black overflow-hidden ">
+             <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black ">
                   <img  ref={image2} className="w-full object-fit" src="/Media/Images/Home/HomeImage4.jpg" alt="Home" />
                    </div>
                     <div  className="w-2 h-210 relative bottom-3 rounded-full bg-[#B2BEB5] border-1 border-[#B2BEB5] shadow-lg z-1"> </div>
@@ -198,10 +199,13 @@ export default function Home() {
     );
   })}
 </div>
-<h1 className="font-edwardian text-8xl text-red-500 relative left-[75%] bottom-50 animate-pulse"> <a href="/Home">  Visit Shop </a>  </h1>
-</div>
+<div className="flex justify-end relative py-60 px-20">
+  <h1 className="font-edwardian text-8xl text-red-500 animate-pulse">
+    <a href="/Home">Visit Shop</a>
+  </h1>
+</div></div>
 
-
+<Footer/>
 
         </div>
     )

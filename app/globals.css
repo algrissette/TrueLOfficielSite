@@ -19,7 +19,6 @@
   --font-mono: var(--font-geist-mono);
   --font-edwardian: "Edwardian Script ITC";
 
-  /* 👇 THIS is what creates animate-zoom-in */
   --animate-zoom-in: zoom-in 7s ease-in-out ;
   @keyframes zoom-in {
   0% {
