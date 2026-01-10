@@ -1,3 +1,5 @@
+import { CiLogin } from "react-icons/ci"
+
 type navBarProps = {
 font : string,
 color: string
@@ -22,18 +24,16 @@ const fontFamily = () =>{
     <nav className="sticky top-0 z-1000"> 
         <div className="flex bg-black w-full ">
           
-          <div className="flex ">
-
-            <ul className="flex justify-start gap-5 m-1 mx-5"   style={{color, fontFamily: font}}> 
-
-                <li className= " text-2xl hover:text-[#4C9AFF]" > 
-                    <a href="/">WHAT </a> </li>
-                <li className= " text-2xl hover:text-[#4C9AFF]" > 
-                    <a href="/">WHO </a> </li>
-                <li className= " text-2xl hover:text-[#4C9AFF]" > 
-                    <a href="/">WHY </a> </li>
-                </ul> 
-                </div>
+         <div className="flex justify-between items-center w-full">
+  <ul className="flex gap-5 m-1 mx-5" style={{ color, fontFamily: font }}>
+    <li className="text-2xl hover:text-[#4C9AFF]"><a href="/">WHAT</a></li>
+    <li className="text-2xl hover:text-[#4C9AFF]"><a href="/">WHO</a></li>
+    <li className="text-2xl hover:text-[#4C9AFF]"><a href="/">WHY</a></li>
+  </ul>
+  <a href="/Authentication/Login"> 
+  <CiLogin className="text-white cursor-pointer hover:text-[#4C9AFF] transition mr-5" size={28} />
+  </a>
+</div>
 
         </div>
     </nav>
