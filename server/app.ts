@@ -1,3 +1,4 @@
+
 import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -40,7 +41,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server
-const PORT: number = parseInt(process.env.PORT || '3001', 10);
+const PORT: number = parseInt(process.env.PORT || '4000', 10);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

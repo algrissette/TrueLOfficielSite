@@ -1,7 +1,114 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, response } from 'express';
 import { IUser } from '../models/users';
 import db from '../util/database';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import dotenv from 'dotenv'
+import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
+const jwtPassword = process.env.JWTSECRETKEY
+
+
+dotenv.config()
+
+
+export const signIn = async (
+  req: Request<{}, {}, { email: string; password: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  
+  try {
+    const { email, password } = req.body;
+    
+
+
+    const emailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    if (!checkPasswordCriteria(password)) {
+      return res.status(400).json({ message: "Password must have 8 characters, 1 number and one capital" });
+    }
+ 
+      const isValid = await checkPassword(email, password);
+  if (!isValid) return res.status(401).json({ message: "Invalid credentials" });
+
+const [rows] = await db.execute(
+  "SELECT id, password_hash FROM users WHERE email = ? LIMIT 1",
+  [email]
+);
+
+const user = (rows as any[])[0];
+if (!jwtPassword) {
+  throw new Error("JWT secret not defined in environment variables");
+}
+
+const token = jwt.sign({ userId: user.id }, jwtPassword, { expiresIn: "1h" });
+
+
+
+    res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      })
+      .json({ message: "User is logged in" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
+const userExists = async (email: string): Promise<boolean> => {
+  const [rows] = await db.execute(
+    "SELECT 1 FROM users WHERE email = ? LIMIT 1",
+    [email]
+  );
+  return (rows as any[]).length > 0;
+};
+
+
+
+  const checkPasswordCriteria = (password:string) =>{
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password)
+
+  }
+
+
+
+const hashPassword = async (password: string): Promise<string> => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
+
+const checkPassword = async (
+  email: string,
+  enteredPassword: string
+): Promise<boolean> => {
+  // 1️⃣ Query the user by email
+  const [rows] = await db.execute(
+    "SELECT password FROM users WHERE email = ? LIMIT 1",
+    [email]
+  );
+
+  const user = (rows as any[])[0];
+  if (!user) {
+    // user not found
+    return false;
+  }
+
+  // 2️⃣ Compare entered password with hash
+  const isValid = await bcrypt.compare(enteredPassword, user.password_hash);
+  return isValid;
+};
 
 // Create a new user
 export const createUser = async (
@@ -9,18 +116,34 @@ export const createUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { firstName, lastName, email, dob, sud } = req.body;
+  const { firstName, lastName, email, password, dob, sud } = req.body;
 
   // basic validation
-  if (!firstName || !lastName || !email || !dob || sud === undefined) {
+  if (!firstName || !lastName || !email || !dob || !password || sud === undefined) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
+      if (await userExists(email)) {
+  return res.status(409).json({ message: "User with this email already exists" });
+}
+    const emailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+ if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    if (!checkPasswordCriteria(password)) {
+      return res.status(400).json({ message: "Password must have 8 characters, 1 number and one capital" });
+    }
+  const hashedPassword = await hashPassword(password)
+
     const [result]: [ResultSetHeader, any] = await db.execute(
-      'INSERT INTO users (FIRST_NAME, LAST_NAME, EMAIL, DOB, SUD) VALUES (?, ?, ?, ?, ?)',
-      [firstName, lastName, email, dob, sud]
+      'INSERT INTO users (FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, DOB, SUD) VALUES (?, ?, ?,?, ?, ?)',
+      [firstName, lastName, email,hashedPassword, dob, sud]
     );
+    
 
     res.status(201).json({
       message: 'User created',
