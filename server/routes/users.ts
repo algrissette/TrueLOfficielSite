@@ -11,6 +11,7 @@ router.get('/:id', getUserById);
 // POST create user
 router.post('/create', createUser);
 
+//log in and sign in 
 router.post('/signIn', signIn)
 
 export default router;

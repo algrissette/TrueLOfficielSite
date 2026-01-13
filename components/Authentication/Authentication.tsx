@@ -38,6 +38,39 @@ export default function Authentication({ signUp }: { signUp: boolean }) {
   // Common image class for both login/signup
   const imageClass = "w-1/2 h-full object-cover aspect-[4/5]";
 
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  const form = event.target as HTMLFormElement;
+  const email = form.email.value;
+  const password = form.password.value;
+
+  try {
+    const response = await fetch("http://localhost:4000/users/signIn", {
+      method: "POST",
+      credentials: "include", // <-- send/receive cookies
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      // Handle non-200 responses
+      const errorData = await response.json();
+      console.error("Error signing in user:", errorData);
+      setErrorNotice("Failed to sign in account. Please try again.");
+      return;
+    }
+
+    const data = await response.json();
+    console.log("User signed In:", data);
+
+  } catch (error: any) {
+    console.error("Error signing in user:", error.message);
+    setErrorNotice("Failed to sign in account. Please try again.");
+  }
+};
+
  const handleSignUp = async (event: React.FormEvent<HTMLFormElement>) => {
   event.preventDefault();
 
@@ -76,6 +109,7 @@ const sud = today.toISOString().split("T")[0];
     });
 
     console.log("User created:", response.data);
+
   } catch (error: any) {
     console.error("Error creating user:", error.response?.data || error.message);
     setErrorNotice("Failed to create account. Please try again.");
@@ -191,12 +225,12 @@ function isOver18(dobString: string): boolean {
             Welcome Back
           </h2>
 
-          <form className="flex flex-col gap-6 w-full p-8">
-            <input className="border-2 rounded p-3 w-full focus:ring-2 focus:ring-pink-400 transition" placeholder="Email" />
+          <form onSubmit={handleSignIn} className="flex flex-col gap-6 w-full p-8">
+            <input  name= "email" className="border-2 rounded p-3 w-full focus:ring-2 focus:ring-pink-400 transition" placeholder="Email" />
 
             {/* Password field with toggle */}
             <div className="flex gap-2 w-full relative items-center">
-              <input
+              <input name= "password"
                 type={isVisible ? "text" : "password"}
                 className="border-2 rounded p-3 w-full focus:ring-2 focus:ring-pink-400 transition"
                 placeholder="Password"

@@ -3,19 +3,31 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
+
+
 
 // Load environment variables
 dotenv.config();
 
 // Import your user routes
 import userRoutes from './routes/users';
+import protectedRoutes from './routes/protected'
 
 // Create Express app
 const app = express();
 
 // Middleware
-app.use(express.json()); // parse JSON bodies
-app.use(cors());         // optional: allow cross-origin requests
+app.use(express.json());
+
+// parse JSON bodies
+const corsOptions = {
+  origin: 'http://localhost:3000', // Explicitly allow the client origin
+  credentials: true,               // Essential for allowing cookies/auth headers
+  optionsSuccessStatus: 200        // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Log requests (optional)
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -23,7 +35,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+app.use(cookieParser())
+
 // Routes
+app.use('/protected', protectedRoutes)
 app.use('/users', userRoutes);
 
 // Optional: serve static files
