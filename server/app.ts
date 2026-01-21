@@ -13,6 +13,9 @@ dotenv.config();
 // Import your user routes
 import userRoutes from './routes/users';
 import protectedRoutes from './routes/protected'
+import shopify from './routes/shopify'
+
+import products from './routes/products'
 
 // Create Express app
 const app = express();
@@ -40,6 +43,9 @@ app.use(cookieParser())
 // Routes
 app.use('/protected', protectedRoutes)
 app.use('/users', userRoutes);
+app.use('/products', products)
+app.use('/shopify', shopify)
+
 
 // Optional: serve static files
 app.use(express.static(path.join(__dirname, 'public')));

@@ -1,51 +1,77 @@
-
 'use client';
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function What() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  const api = axios.create({
-    baseURL: "http://localhost:4000", // your backend URL
-    withCredentials: true, // send/receive cookies
-  });
-
-const checkAuth = async () => {
-  try {
-    const response = await fetch("http://localhost:4000/protected/check", {
-      method: "GET",
-      credentials: "include", // <-- send/receive cookies
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      console.error("Auth check failed:", response.statusText);
-      setIsAuthenticated(false);
-      return;
-    }
-
-    const data = await response.json();
-    setIsAuthenticated(data.authenticated); // make sure backend returns { authenticated: true/false }
-
-  } catch (err) {
-    console.error("Auth check error:", err);
-    setIsAuthenticated(false);
-  }
+type Product = {
+  title: string;
 };
 
-  // Example: check auth when component mounts
+export default function What() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+
+  const api = axios.create({
+    baseURL: "http://localhost:4000",
+    withCredentials: true,
+  });
+
+  const checkAuth = async (): Promise<boolean> => {
+    try {
+      const { data } = await api.get("/protected/check");
+      setIsAuthenticated(data.authenticated);
+      return data.authenticated;
+    } catch (err) {
+      console.error(err);
+      setIsAuthenticated(false);
+      return false;
+    }
+  };
+
+  const getFirstSix = async () => {
+    try {
+      setLoadingProducts(true);
+      const res = await api.get<Product[]>("/products/firstSix"); // ✅ CORRECT
+      setProducts(res.data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   useEffect(() => {
-    checkAuth();
+    const init = async () => {
+      const authed = await checkAuth();
+      if (!authed) {
+        await getFirstSix();
+      }
+    };
+
+    init();
   }, []);
 
   return (
     <div>
       {isAuthenticated === null && <p>Checking auth...</p>}
+
       {isAuthenticated === true && <p>User is authenticated ✅</p>}
-      {isAuthenticated === false && <p>User is not authenticated ❌</p>}
+
+      {isAuthenticated === false && (
+        <>
+          <p>User is not authenticated ❌</p>
+
+          {loadingProducts && <p>Loading products...</p>}
+
+          {!loadingProducts && (
+            <ul>
+              {products.map((product) => (
+                <li key={product.title}>{product.title}</li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
     </div>
   );
 }

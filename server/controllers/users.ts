@@ -53,8 +53,8 @@ export const sendCookie = (userId: number, res: Response) => {
 
   res.cookie("truceCookieName", token, {
     httpOnly: true,      // cannot be accessed by JS
-    secure: false,       // must be false on localhost; true in production with HTTPS
-    sameSite: "lax",     // 'lax' works well for localhost; 'none' requires secure:true
+    secure: true,       // must be false on localhost; true in production with HTTPS
+    sameSite: "none",     // 'lax' works well for localhost; 'none' requires secure:true
     path: "/",           // available for all routes
     maxAge: 3600 * 1000, // 1 hour
   });
