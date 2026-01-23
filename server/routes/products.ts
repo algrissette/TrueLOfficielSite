@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { getFirstSix } from '../controllers/products';
+import { getAllProducts } from '../controllers/products';
 
 const router = Router()
 
-router.get("/firstSix", getFirstSix)
+router.get("/getAllProducts", getAllProducts)
 
 export default router;

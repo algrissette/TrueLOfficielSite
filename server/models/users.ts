@@ -14,4 +14,5 @@ export interface IUser {
   password: string;
   dob: Date;           // or Date
   sud: Date;
+  cart?: number;
 }

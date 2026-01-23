@@ -28,50 +28,18 @@ export default function What() {
     }
   };
 
-  const getFirstSix = async () => {
-    try {
-      setLoadingProducts(true);
-      const res = await api.get<Product[]>("/products/firstSix"); // ✅ CORRECT
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Error fetching products:", err);
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
 
   useEffect(() => {
     const init = async () => {
-      const authed = await checkAuth();
-      if (!authed) {
-        await getFirstSix();
-      }
+       await checkAuth();
     };
 
     init();
+    console.log(isAuthenticated)
   }, []);
 
+
   return (
-    <div>
-      {isAuthenticated === null && <p>Checking auth...</p>}
-
-      {isAuthenticated === true && <p>User is authenticated ✅</p>}
-
-      {isAuthenticated === false && (
-        <>
-          <p>User is not authenticated ❌</p>
-
-          {loadingProducts && <p>Loading products...</p>}
-
-          {!loadingProducts && (
-            <ul>
-              {products.map((product) => (
-                <li key={product.title}>{product.title}</li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
-    </div>
+   <div> </div>
   );
 }

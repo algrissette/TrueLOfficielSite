@@ -17,6 +17,8 @@ import shopify from './routes/shopify'
 
 import products from './routes/products'
 
+import cart from "./routes/cart"
+
 // Create Express app
 const app = express();
 
@@ -45,6 +47,7 @@ app.use('/protected', protectedRoutes)
 app.use('/users', userRoutes);
 app.use('/products', products)
 app.use('/shopify', shopify)
+app.use("/cart", cart )
 
 
 // Optional: serve static files
