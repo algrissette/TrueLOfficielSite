@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+//get the shopify access token from the constructed link from the shopify docs 
+
 interface ShopifyAccessTokenResponse {
   access_token: string;
   scope: string;

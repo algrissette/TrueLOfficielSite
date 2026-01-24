@@ -8,8 +8,8 @@ dotenv.config();
 
 
 type ProductOption = {
-  name: string;        
-  values: string[];    
+  name: string;
+  values: string[];
 };
 
 type ProductNode = {
@@ -19,7 +19,7 @@ type ProductNode = {
   status: string;
   createdAt: string;
   updatedAt: string;
-  options: ProductOption[]; 
+  options: ProductOption[];
 };
 
 type ProductEdge = { cursor: string; node: ProductNode };
@@ -29,7 +29,7 @@ type GetAllProductsResponse = { data: { products: ProductsConnection } };
 
 
 export const getTenProducts = async (req: Request, res: Response) => {
-  if (!process.env.GRAPHQL_API_URL || !process.env.ADMIN_API_ACCESS_TOKEN) {
+  if (!process.env.GRAPHQL_ADMIN_URL || !process.env.ADMIN_API_ACCESS_TOKEN) {
     return res.status(500).json({ error: "Missing .env credentials" });
   }
 
@@ -44,7 +44,7 @@ export const getTenProducts = async (req: Request, res: Response) => {
       }
     `;
 
-    const result = await fetch(process.env.GRAPHQL_API_URL, {
+    const result = await fetch(process.env.GRAPHQL_ADMIN_URL!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,8 @@ export const getTenProducts = async (req: Request, res: Response) => {
     });
 
     const data = (await result.json()) as { data: { products: { nodes: { title: string }[] } } };
-    res.json(data);
+    console.log(data)
+    res.json(data.data.products.nodes);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch products" });
@@ -63,7 +64,7 @@ export const getTenProducts = async (req: Request, res: Response) => {
 
 // Full fetch with product options included
 export const getAllProducts = async (req: Request, res: Response) => {
-  if (!process.env.GRAPHQL_API_URL || !process.env.ADMIN_API_ACCESS_TOKEN) {
+  if (!process.env.GRAPHQL_ADMIN_URL || !process.env.ADMIN_API_ACCESS_TOKEN) {
     return res.status(500).json({ error: "Missing .env credentials" });
   }
 
@@ -73,35 +74,42 @@ export const getAllProducts = async (req: Request, res: Response) => {
     let more = true;
 
     const query = gql`
-      query getAll($cursor: String) {
-        products(first: 100, after: $cursor) {
+     query getAll($cursor: String) {
+  products(first: 100, after: $cursor) {
+    edges {
+      cursor
+      node {
+        id
+        title
+        handle
+        status
+        createdAt
+        updatedAt
+        options {
+          name
+          values
+        }
+        variants(first: 10) {
           edges {
-            cursor
-            node {
-              id
-              title
-              handle
-              status
-              createdAt
-              updatedAt
-              options {
-                name
-                values
-              }
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
+            node{
+            id}
           }
         }
       }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
     `;
 
     while (more) {
       const variables = cursor ? { cursor } : {};
 
-      const result = await fetch(process.env.GRAPHQL_API_URL, {
+      const result = await fetch(process.env.GRAPHQL_ADMIN_URL!, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
