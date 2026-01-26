@@ -38,6 +38,12 @@ export type VariantEdge = {
 
 export type VariantNode = {
     id: string
+    image: Image
+}
+
+export type Image = {
+    url: string
+    altText: string
 }
 
 // Quick search products

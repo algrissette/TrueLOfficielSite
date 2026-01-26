@@ -75,7 +75,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
         variants(first: 10) {
           edges {
             node{
-            id}
+            id 
+            image{
+            url (transform: { maxWidth: 800, maxHeight: 800 })
+            altText}
+            }
           }
         }
       }
