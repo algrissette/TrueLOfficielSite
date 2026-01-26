@@ -2,30 +2,13 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { gql } from "../util/gql";
 import fetch from "node-fetch";
+import { ProductNode, Products, QuickSearchProducts } from "../util/datatypes";
 
 dotenv.config();
 
 
 
-type ProductOption = {
-  name: string;
-  values: string[];
-};
 
-type ProductNode = {
-  id: string;
-  title: string;
-  handle: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  options: ProductOption[];
-};
-
-type ProductEdge = { cursor: string; node: ProductNode };
-type PageInfo = { hasNextPage: boolean; endCursor: string | null };
-type ProductsConnection = { edges: ProductEdge[]; pageInfo: PageInfo };
-type GetAllProductsResponse = { data: { products: ProductsConnection } };
 
 
 export const getTenProducts = async (req: Request, res: Response) => {
@@ -53,9 +36,9 @@ export const getTenProducts = async (req: Request, res: Response) => {
       body: JSON.stringify({ query }),
     });
 
-    const data = (await result.json()) as { data: { products: { nodes: { title: string }[] } } };
+    const { data } = (await result.json()) as { data: { products: QuickSearchProducts } };
     console.log(data)
-    res.json(data.data.products.nodes);
+    res.json(data.products.nodes);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch products" });
@@ -118,11 +101,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
         body: JSON.stringify({ query, variables }),
       });
 
-      const data = (await result.json()) as GetAllProductsResponse;
+      const { data } = (await result.json()) as { data: { products: Products } };
 
-      all.push(...data.data.products.edges.map(e => e.node));
-      more = data.data.products.pageInfo.hasNextPage;
-      cursor = data.data.products.pageInfo.endCursor;
+      all.push(...data.products.edges.map(e => e.node));
+      more = data.products.pageInfo.hasNextPage;
+      cursor = data.products.pageInfo.endCursor;
     }
 
     return res.status(200).json(all);

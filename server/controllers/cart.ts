@@ -1,59 +1,8 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { gql } from "../util/gql";
+import { Cart, CartLine, GetCartVariables, UpdateCartInput } from "../util/datatypes";
 dotenv.config();
-
-// ===== Shared Types =====
-export type MoneyV2 = {
-  amount: string
-  currencyCode: string
-}
-
-export type Attribute = { key: string; value: string }
-
-export type ProductVariant = {
-  id: string
-  title: string
-  availableForSale: boolean
-  price: MoneyV2
-  compareAtPrice: MoneyV2 | null
-  image: { id: string; altText: string | null; url: string } | null
-}
-
-export type CartLine = {
-  id: string
-  quantity: number
-  attributes: Attribute[]
-  cost: { totalAmount: MoneyV2 }
-  merchandise: ProductVariant
-}
-
-export type CartLineEdge = { cursor: string; node: CartLine }
-export type CartLines = { edges: CartLineEdge[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } }
-
-export type CartCost = {
-  totalAmount: MoneyV2
-  subtotalAmount: MoneyV2
-  totalTaxAmount: MoneyV2 | null
-  totalDutyAmount: MoneyV2 | null
-}
-
-export type Cart = {
-  id: string
-  checkoutUrl: string
-  createdAt: string
-  attributes: Attribute[]
-  cost: CartCost
-  lines: CartLines
-}
-
-export type GetCartResponse = { data: { cart: Cart | null } }
-
-export type GetCartVariables = { input: string; cursor?: string | null }
-
-export type CartLineUpdate = { id: string; quantity: number }
-export type UpdateCartInput = { cartId: string; lines: CartLineUpdate[] }
-
 
 const STOREFRONT_URL = process.env.GRAPHQL_API_URL!
 const STOREFRONT_TOKEN = process.env.STOREFRONT_PUBLIC_API_URL!
@@ -233,7 +182,7 @@ export const getAllCartItems = async (req: Request, res: Response) => {
         body: JSON.stringify({ query, variables }),
       })
 
-      const data = (await result.json()) as GetCartResponse
+      const data = (await result.json()) as { data: { cart: Cart } }
 
       if (!data.data.cart) return res.status(200).json({ message: "No cart found" })
 
