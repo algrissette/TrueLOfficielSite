@@ -2,20 +2,9 @@
 
 import { api } from "@/app/util/apicCall";
 import { ProductLite, ProductNode, VariantNode } from "@/app/util/datatypes";
+import NavBar from "@/components/navbar/navbar";
 import { useSearchParams, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-type Variant = {
-    id: string;
-    title: string;
-    availableForSale: boolean;
-    barcode?: string;
-    compareAtPrice?: string; // Admin API scalar
-    image?: {
-        url: string;
-        altText?: string;
-    };
-};
 
 export default function ItemPage() {
     const params = useParams();
@@ -60,6 +49,8 @@ export default function ItemPage() {
             try {
                 const res = await api.post("/products/getProductVariantById", { id: fullVariantId });
                 const data = res.data as VariantNode
+                console.log(data)
+
                 setVariant(data);
             } catch (err) {
                 console.error(err);
@@ -77,55 +68,11 @@ export default function ItemPage() {
 
 
     return (
-        <div className="p-8">
-            <h1 className="text-xl font-bold mb-2">Dynamic Item Page</h1>
 
-            <p>
-                Folder ID segment: <strong>{params.id}</strong>
-            </p>
+        <h1 className="w-full h-48 bg-red-200">
+            Hdghsfsftghello
+        </h1>
 
-            {productId ? (
-                <p className="mt-2">
-                    Parent Product ID: <strong>{productId}</strong>
-                </p>
-            ) : (
-                <p className="text-red-500 mt-2">No Parent Product ID found</p>
-            )}
+    )
 
-            {variantId ? (
-                <p className="mt-2">
-                    Shopify Variant ID: <strong>{variantId}</strong>
-                </p>
-            ) : (
-                <p className="text-red-500 mt-2">No Shopify Variant ID found</p>
-            )}
-
-            <div className="mt-6">
-                {loading && <p>Loading variant...</p>}
-                {error && <p className="text-red-500">{error}</p>}
-
-                {variant && (
-                    <div>
-                        <h2 className="text-lg font-semibold">{variant.title}</h2>
-
-                        {variant.image && (
-                            <img
-                                src={variant.image.url}
-                                alt={variant.image.altText || variant.title}
-                                className="w-64 h-auto my-2"
-                            />
-                        )}
-
-                        <p>Available: {variant.availableForSale ? "Yes" : "No"}</p>
-
-                        {variant.barcode && <p>Barcode: {variant.barcode}</p>}
-
-                        {variant.compareAtPrice && (
-                            <p>Price: {variant.compareAtPrice}</p>
-                        )}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
 }

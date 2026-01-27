@@ -45,7 +45,12 @@ export type VariantNode = {
     barcode: string
     compareAtPrice: string
     createdAt: string
+    selectedOptions: OptionType[]
 
+}
+export type OptionType = {
+    name: string
+    value: string
 }
 
 export type Image = {
@@ -65,9 +70,12 @@ export type ProductNodeSimple = {
 export type ProductLite = {
     id: string,
     title: string,
-    variants: Variants
+    variants: VariantsLite
 }
 
+export type VariantsLite = {
+    nodes: VariantNode[]
+}
 
 
 

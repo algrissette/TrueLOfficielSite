@@ -115,6 +115,9 @@ export const getProductVariantById = async (req: Request, res: Response) => {
     barcode
     compareAtPrice  # scalar string
     createdAt
+    selectedOptions{
+    name 
+    value}
     image {
       url(transform: { maxWidth: 800, maxHeight: 800 })
       altText
