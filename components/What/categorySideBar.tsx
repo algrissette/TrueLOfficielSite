@@ -142,7 +142,7 @@ export default function CategorySideBar() {
 
                         {/* DROPDOWN */}
                         {openCategory === item.name && (
-                            <div className="absolute left-0 top-full mt-2 w-56 rounded-md border border-gray-200 bg-white shadow-lg p-3 space-y-2">
+                            <div className="absolute left-0 top-full mt-0 w-full  border border-gray-200 bg-white shadow-lg p-3 space-y-2">
                                 {item.values.map(v => (
                                     <label
                                         key={v}

@@ -30,7 +30,6 @@ export default function What() {
                         return option.values.some((value) => paramValues.includes(value));
                     })
                 );
-                console.log("lalalalallala", filtered)
 
                 setProducts(filtered);
             } catch (err) {
@@ -44,7 +43,6 @@ export default function What() {
     return (
         <div>
             <NavBar font="sans" color="#ffffff" />
-            <h1>Helloo</h1>
             <CategorySideBar />
             <ProductGrid
                 products={products} />

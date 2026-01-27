@@ -15,6 +15,7 @@ export type ProductEdge = {
 export type ProductNode = {
     id: string
     title: string
+    description: string
     handle: string
     status: string
     createdAt: string
@@ -39,6 +40,12 @@ export type VariantEdge = {
 export type VariantNode = {
     id: string
     image: Image
+    title: string
+    availableForSale: boolean
+    barcode: string
+    compareAtPrice: string
+    createdAt: string
+
 }
 
 export type Image = {
@@ -55,6 +62,11 @@ export type ProductNodeSimple = {
     title: string
 }
 
+export type ProductLite = {
+    id: string,
+    title: string,
+    variants: Variants
+}
 
 
 

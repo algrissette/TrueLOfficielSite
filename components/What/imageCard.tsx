@@ -2,15 +2,14 @@ import { ProductNode } from "@/app/util/datatypes";
 import Link from "next/link";
 
 export default function ImageCard({ item }: { item: ProductNode }) {
-    // Grab the first variant (or adjust to whichever variant you want to show)
     const firstVariant = item.variants.edges[0]?.node;
-
     if (!firstVariant || !firstVariant.image?.url) return null;
 
     const imageUrl = firstVariant.image.url;
-    const variantId = encodeURIComponent(firstVariant.id); // Shopify GID
-    const productId = encodeURIComponent(item.id); // Parent product GID
-    console.log(productId)
+
+    // Extract numeric IDs from Shopify GIDs
+    const variantId = encodeURIComponent(firstVariant.id.split("/").pop() || "");
+    const productId = encodeURIComponent(item.id.split("/").pop() || "");
 
     return (
         <div className="relative w-full overflow-hidden rounded-lg group cursor-pointer">
@@ -18,15 +17,13 @@ export default function ImageCard({ item }: { item: ProductNode }) {
                 href={`/Items/item?productId=${productId}&variantId=${variantId}`}
                 className="block"
             >
-                {/* IMAGE */}
                 <img
                     src={imageUrl}
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                 />
 
-                {/* OVERLAY ON HOVER */}
-                <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <h3 className="text-white text-lg font-semibold drop-shadow-md">
                         {item.title}
                     </h3>
@@ -36,7 +33,6 @@ export default function ImageCard({ item }: { item: ProductNode }) {
                     </span>
                 </div>
 
-                {/* SUBTLE SHADOW ON HOVER */}
                 <div className="absolute inset-0 pointer-events-none group-hover:shadow-xl rounded-lg transition-shadow duration-300"></div>
             </Link>
         </div>
