@@ -113,69 +113,69 @@ export default function Home() {
 
 
   return (
-    <div className=" maindiv">
-      <div className="overflow-x-hidden w-full h-[100dvh]  ">
-        <div className="absolute top-[50%] left-[50%]">
-          <h1 className="text-9xl font-edwardian text-black relative top-10 ">Truce L'officiel</h1>
-          <div className="bg-white rounded-full h-[30px] w-[600px]"> </div>
+    <div className="maindiv">
+      {/* Video section */}
+      <div className="overflow-x-hidden w-full h-[100dvh]">
+        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-1">
+          <h1 className="text-9xl font-edwardian text-white">Truce L'officiel</h1>
+          <div className="bg-white rounded-full h-[30px] w-[600px]"></div>
         </div>
 
-        <video className="w-full h-[100dvh] object-cover "
+        <video className="w-full h-[100dvh] object-cover"
           width="100%" height="100%" autoPlay muted loop>
           <source src="/Media/Videos/IntroductionVideo.mp4" type="video/mp4" />
-          Hello
         </video>
       </div>
 
-      <NavBar
-        font="sans"
-        color="#ffffff"
-      />
+      <NavBar font="sans" color="#ffffff" />
 
-
-      <div className=" imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] sm:hidden md:block ">
-        <div className=" sm:flex-col md:flex-row flex justify-between items-start">
+      {/* Image reveal section */}
+      <div className="imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] sm:hidden md:block relative">
+        {/* Base layer images */}
+        <div className="flex justify-between items-start">
           <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
-            <img className=" w-full object-cover " src="/Media/Images/Home/HomeImage1.jpg" alt="Home" />
+            <img className="w-full h-full object-cover" src="/Media/Images/Home/HomeImage1.jpg" alt="Home" />
           </div>
 
-          <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black ">
-            <img className=" w-full object-cover " src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
+          <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
+            <img className="w-full h-full object-cover" src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
           </div>
-          <div ref={animationBar} className="w-2 h-210 relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[#46B8FF] shadow-lg z-1"> </div>
 
-
-        </div>
-        <div className="flex relative top-[-840px] justify-between items-start  " >
-          <div id="Image-Dupe-1" className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
-            <img ref={image1} className="  w-full object-fit " src="/Media/Images/Home/HomeImage3.jpg" alt="Home" />
-          </div>
-          <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black ">
-            <img ref={image2} className="w-full object-fit" src="/Media/Images/Home/HomeImage4.jpg" alt="Home" />
-          </div>
-          <div className="w-2 h-210 relative bottom-3 rounded-full bg-white  shadow-lg z-1"> </div>
-
+          <div ref={animationBar} className="w-2 h-210 relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[#46B8FF] shadow-lg z-1"></div>
         </div>
 
+        {/* Overlay layer images (reveal effect) */}
+        <div className="flex absolute top-2 left-0 justify-between items-start w-full">
+          <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
+            <img ref={image1} className="w-full h-full object-cover" src="/Media/Images/Home/HomeImage3.jpg" alt="Home" />
+          </div>
+
+          <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
+            <img ref={image2} className="w-full h-full object-cover" src="/Media/Images/Home/HomeImage4.jpg" alt="Home" />
+          </div>
+
+          <div className="w-2 h-210 relative bottom-3 rounded-full bg-white shadow-lg z-1"></div>
+        </div>
       </div>
 
-      <div className="wordEffect">
+      {/* Word effect section - needs wrapper for sticky to work */}
+      <div className="relative">
         <div
           ref={container}
           className="
-   pl-[5%]
-    h-[100svh]
-    perspective-[1000px]
-    [transform-style:preserve-3d]
-    grid
-    grid-rows-[repeat(4,25dvh)]
-    grid-cols-[repeat(4,25dvw)]
-    sticky
-    top-0
-    overflow-clip 
-    bg-black
-    wordEffect
-  "
+          wordEffect
+          pl-[5%]
+          h-[100svh]
+          perspective-[1000px]
+          [transform-style:preserve-3d]
+          grid
+          grid-rows-[repeat(4,25dvh)]
+          grid-cols-[repeat(4,25dvw)]
+          sticky
+          top-0
+          overflow-clip 
+          bg-black
+        "
         >
           {wordList.map((word, key) => {
             const fontSize = 75 + Math.random() * 30;
@@ -195,18 +195,18 @@ export default function Home() {
               >
                 {word}
               </div>
-
             );
           })}
         </div>
-        <div className="flex justify-end relative py-60 px-20">
+
+        <div className="flex justify-end relative py-60 px-20 ">
           <h1 className="font-edwardian text-8xl text-red-500 animate-pulse">
             <a href="/Home">Visit Shop</a>
           </h1>
-        </div></div>
+        </div>
+      </div>
 
       <Footer />
-
     </div>
-  )
+  );
 }
