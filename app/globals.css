@@ -13,7 +13,6 @@
 @font-face {
   font-family: "Edwardian Script ITC";
   src: url("/fonts/edwardianscriptitc.ttf");
-  /* remove /public */
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -28,16 +27,79 @@
   }
 
   50% {
-    transform: translateZ(1000px);
+    transform: translateZ(0px);
     opacity: 1;
     filter: blur(0px);
   }
 
   100% {
-    transform: translateZ(0);
+    transform: translateZ(1000px);
     opacity: 0;
     filter: blur(5px);
   }
+}
+
+@keyframes blink-back {
+  0% {
+    transform: translateZ(0px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateZ(0px);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+/* Custom cursor animations */
+@keyframes sparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 1s ease-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* WordEffect styling */
+.wordEffect {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animation trigger class */
+.animate-zoom-in {
+  animation:
+    zoom-in 2s ease-out,
+    blink-back 0.3s ease-out 2s forwards;
+  will-change: transform, opacity, filter;
 }
 
 /* Dark mode */
@@ -59,9 +121,88 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  cursor: none;
+  /* Hide default cursor */
 }
 
-.animate-zoom-in {
-  animation:
-    zoom-in 5s
+/* Show default cursor on interactive elements */
+a,
+button,
+input,
+textarea,
+select {
+  cursor: none;
+}
+
+/* Cosmic navbar animations */
+@keyframes float-particle {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes shooting-star {
+  0% {
+    transform: translateX(-100%) translateY(0) rotate(-45deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(200vw) translateY(100px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-out {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translate(calc(cos(var(--angle)) * 30px), calc(sin(var(--angle)) * 30px)) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle 6s ease-in-out infinite;
+}
+
+.animate-sparkle-out {
+  animation: sparkle-out 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
+}
+
+
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), transparent);
+  transform-origin: left center;
 }

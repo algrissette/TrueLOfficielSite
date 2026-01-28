@@ -2,6 +2,7 @@
 
 import { api } from "@/app/util/apicCall";
 import { ProductNode } from "@/app/util/datatypes";
+import Footer from "@/components/footer/footer";
 import NavBar from "@/components/navbar/navbar";
 import CategorySideBar from "@/components/What/categorySideBar";
 import ProductGrid from "@/components/What/productGrid";
@@ -46,11 +47,12 @@ export default function What() {
   }, [searchParams]);
 
   return (
-    <div>
+    <div className="bg-black">
       <NavBar font="sans" color="#ffffff" />
       <CategorySideBar />
       <ProductGrid
         products={products} />
+      <Footer />
     </div>
   );
 }

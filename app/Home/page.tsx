@@ -32,7 +32,7 @@ export default function Home() {
     "Frame",       // 9
     "Spark",       // 10
     "Pulse",       // 11
-    "Truce",       // 12 - middle word
+    "Truc",       // 12 - middle word
     "Loom",        // 13
     "Wander",      // 14
     "Twist",       // 15
@@ -116,9 +116,18 @@ export default function Home() {
     <div className="maindiv">
       {/* Video section */}
       <div className="overflow-x-hidden w-full h-[100dvh]">
-        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-1">
-          <h1 className="text-9xl font-edwardian text-white">Truce L'officiel</h1>
-          <div className="bg-white rounded-full h-[30px] w-[600px]"></div>
+        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-10">
+          <h1 className="text-9xl font-edwardian text-black drop-shadow-2xl">Trucé L'Officiel</h1>
+
+          {/* Animated particles */}
+          <div className="relative h-[30px] w-[600px] flex items-center justify-around gap-2">
+            <div className="w-3 h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
+            <div className="w-3 h-3 bg-[#FFE735] rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+            <div className="w-3 h-3 bg-[#F594FE] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            <div className="w-3 h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+            <div className="w-3 h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '500ms' }}></div>
+          </div>
         </div>
 
         <video className="w-full h-[100dvh] object-cover"
@@ -141,7 +150,7 @@ export default function Home() {
             <img className="w-full h-full object-cover" src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
           </div>
 
-          <div ref={animationBar} className="w-2 h-210 relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[#46B8FF] shadow-lg z-1"></div>
+          <div ref={animationBar} className="w-2 h-[727px] relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[#46B8FF] shadow-lg z-1"></div>
         </div>
 
         {/* Overlay layer images (reveal effect) */}
@@ -190,7 +199,7 @@ export default function Home() {
                   fontSize: `${fontSize}px`,
                   fontFamily: "Edwardian Script ITC",
                   color: randomColor,
-                  animationDelay: `${Math.random() * 1.5}s`
+                  animationDelay: `${Math.random() * 2}s`
                 }}
               >
                 {word}
