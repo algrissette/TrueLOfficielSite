@@ -45,6 +45,7 @@ export type VariantNode = {
     barcode: string
     compareAtPrice: string
     createdAt: string
+    price: number
     selectedOptions: {
         name: string;   // e.g., "Color"
         value: string;  // e.g., "Red"
@@ -70,6 +71,7 @@ export type ProductNodeSimple = {
 export type ProductLite = {
     id: string,
     title: string,
+    description: string
     variants: VariantsLite
 }
 

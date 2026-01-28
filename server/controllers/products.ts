@@ -67,6 +67,9 @@ export const getProductBYId = async (req: Request, res: Response) => {
                 url(transform: { maxWidth: 800, maxHeight: 800 })
                 altText
               }
+                selectedOptions{
+                name 
+                value}
             }
           }
         }
@@ -107,23 +110,26 @@ export const getProductVariantById = async (req: Request, res: Response) => {
 
   try {
     const query = `
-  query GetProductVariant($id: ID!) {
+query GetProductVariant($id: ID!) {
   productVariant(id: $id) {
     id
     title
     availableForSale
     barcode
+    price           # scalar string
     compareAtPrice  # scalar string
     createdAt
-    selectedOptions{
-    name 
-    value}
+    selectedOptions {
+      name
+      value
+    }
     image {
       url(transform: { maxWidth: 800, maxHeight: 800 })
       altText
     }
   }
 }
+
 `;
 
 
