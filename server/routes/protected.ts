@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { checkAuth } from '../controllers/protected'
+import { checkAuth, logout } from '../controllers/protected'
 const router = Router();
 
-router.get("/check", checkAuth);
+router.post("/check", checkAuth);
+router.post("/logout", logout);
+
 
 
 export default router;

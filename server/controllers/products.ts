@@ -103,6 +103,7 @@ export const getProductBYId = async (req: Request, res: Response) => {
 
 export const getProductVariantById = async (req: Request, res: Response) => {
   const { id } = req.body;
+  console.log("ayo")
 
   if (!process.env.GRAPHQL_ADMIN_URL || !process.env.ADMIN_API_ACCESS_TOKEN) {
     return res.status(500).json({ error: "Missing .env credentials" });
@@ -112,6 +113,7 @@ export const getProductVariantById = async (req: Request, res: Response) => {
     const query = `
 query GetProductVariant($id: ID!) {
   productVariant(id: $id) {
+   
     id
     title
     availableForSale
@@ -119,6 +121,8 @@ query GetProductVariant($id: ID!) {
     price           # scalar string
     compareAtPrice  # scalar string
     createdAt
+
+
     selectedOptions {
       name
       value
@@ -127,6 +131,10 @@ query GetProductVariant($id: ID!) {
       url(transform: { maxWidth: 800, maxHeight: 800 })
       altText
     }
+         product {
+                id
+                title
+              }
   }
 }
 
@@ -151,7 +159,7 @@ query GetProductVariant($id: ID!) {
     if (!data) {
       return res.status(404).json({ error: "Variant not found" });
     }
-
+    console.log("my log", data.productVariant)
     return res.json(data.productVariant);
 
   } catch (err) {

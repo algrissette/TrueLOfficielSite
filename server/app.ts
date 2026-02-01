@@ -7,8 +7,12 @@ import cookieParser from "cookie-parser";
 
 
 
+
 // Load environment variables
 dotenv.config();
+
+console.log("🔥 Server starting"); // this will now appear clearly
+
 
 // Import your user routes
 import userRoutes from './routes/users';
@@ -47,7 +51,7 @@ app.use('/protected', protectedRoutes)
 app.use('/users', userRoutes);
 app.use('/products', products)
 app.use('/shopify', shopify)
-app.use("/cart", cart )
+app.use("/cart", cart)
 
 
 // Optional: serve static files
@@ -69,3 +73,4 @@ const PORT: number = parseInt(process.env.PORT || '4000', 10);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+console.log("heyyy")

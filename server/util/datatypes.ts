@@ -10,6 +10,8 @@ export type Products = {
 export type ProductEdge = {
     cursor: string
     node: ProductNode
+    id: string
+    title: string
 }
 
 export type ProductNode = {
@@ -43,16 +45,15 @@ export type VariantNode = {
     title: string
     availableForSale: boolean
     barcode: string
-    compareAtPrice: string
+    compareAtPrice: string      // ✅ Already correct
     createdAt: string
-    price: number
+    price: string               // ✅ Change from number to string
     selectedOptions: {
-        name: string;   // e.g., "Color"
-        value: string;  // e.g., "Red"
+        name: string;
+        value: string;
     }[]
-
+    product: { id: string, title: string }
 }
-
 
 export type Image = {
     url: string
@@ -94,7 +95,12 @@ export type ProductVariant = {
     availableForSale: boolean
     price: MoneyForm
     compareAtPrice?: MoneyForm | null
-    image?: { id: string; altText?: string | null; url: string } | null
+    image?: { id: string; altText?: string | null; url: string } | null,
+    selectedOptions: {
+        name: string,
+        value: string
+    }
+    product: ProductNode
 }
 
 export type CartEdges = {
@@ -111,6 +117,7 @@ export type CartLine = {
     id: string
     quantity: number
     merchandise: ProductVariant
+    cost: CartCost
 }
 
 export type CartCost = {

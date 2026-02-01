@@ -48,19 +48,32 @@ export const sendCookie = (userId: number, res: Response) => {
     throw new Error("JWT secret not defined in environment variables");
   }
 
+  // Generate JWT token
   const token = jwt.sign({ userId }, jwtPassword, { expiresIn: "1h" });
   console.log("Generated JWT:", token);
 
+  // First cookie: the JWT
   res.cookie("truceCookieName", token, {
-    httpOnly: true,      // cannot be accessed by JS
-    secure: true,       // must be false on localhost; true in production with HTTPS
-    sameSite: "none",     // 'lax' works well for localhost; 'none' requires secure:true
-    path: "/",           // available for all routes
+    httpOnly: true,
+    secure: true,       // false on localhost, true in production
+    sameSite: "none",
+    path: "/",
     maxAge: 3600 * 1000, // 1 hour
   });
 
+  // Second cookie: plain user ID
+  res.cookie("userId", userId.toString(), {
+    httpOnly: false,    // userId can be read by JS if needed
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 3600 * 1000, // 1 hour
+  });
+
+  // Finally, send JSON response
   res.json({ message: "User is logged in" });
 };
+
 
 const userExists = async (email: string): Promise<boolean> => {
   const [rows] = await db.execute(
@@ -72,12 +85,12 @@ const userExists = async (email: string): Promise<boolean> => {
 
 
 
-  const checkPasswordCriteria = (password:string) =>{
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    
-    return passwordRegex.test(password)
+const checkPasswordCriteria = (password: string) => {
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-  }
+  return passwordRegex.test(password)
+
+}
 
 
 
@@ -152,6 +165,122 @@ export const createUser = async (
   }
 };
 
+//add a quantity to db table to avoid dupicate items
+//saved item variant id is unique 
+
+
+
+
+export const saveItemInDatabase = async (req: Request, res: Response) => {
+  const variantId = req.body.variantId;
+  const userId = req.cookies.userId; // read from cookie
+
+  if (!userId || !variantId) {
+    return res.status(400).json({ error: "Missing userId or variantId" });
+  }
+
+  try {
+    await db.execute(
+      `
+      INSERT INTO user_saved (USER_ID, VARIANT, QUANTITY)
+      VALUES (?, ?, 1)
+      ON DUPLICATE KEY UPDATE quantity = quantity + 1
+      `,
+      [userId, variantId]
+    );
+
+    res.status(200).json({ success: true, message: "Item saved successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save item", details: err });
+  }
+};
+
+
+export const getSavedItems = async (req: Request, res: Response) => {
+  console.log("starting")
+
+  const userId = req.cookies.userId;
+
+
+  if (!userId) {
+    return res.status(400).json({ error: "Missing userId" });
+  }
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT * FROM user_saved WHERE USER_ID = ?`,
+      [userId]
+    );
+
+    console.log(rows)
+
+    res.status(200).json({ success: true, items: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch saved items", details: err });
+  }
+};
+
+
+
+export const deleteSavedItem = async (req: Request, res: Response) => {
+  const userId = req.cookies.userId;
+  const savedItemId = req.body.savedItemId;
+  console.log("hellooo")
+
+  if (!userId || !savedItemId) {
+    console.log("ID", userId)
+    console.log("saved item", savedItemId)
+
+
+    return res.status(400).json({ error: "Missing userId or savedItemId" });
+
+  }
+
+  try {
+    // Get 
+    // current quantity
+    console.log("done1")
+
+    const [rows]: any = await db.execute(
+      `SELECT quantity FROM user_saved WHERE VARIANT = ? AND USER_ID = ?`,
+      [savedItemId, userId]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ error: "Saved item not found" });
+    }
+    console.log("done2")
+
+    const quantity = rows[0].quantity;
+
+    if (quantity > 1) {
+      console.log("done3")
+
+      // Decrement quantity
+      await db.execute(
+        `UPDATE user_saved SET quantity = quantity - 1 WHERE VARIANT = ? AND USER_ID = ?`,
+        [savedItemId, userId]
+      );
+    } else {
+      // Delete item
+      console.log("done4")
+
+      await db.execute(
+        `DELETE FROM user_saved WHERE VARIANT = ? AND USER_ID = ?`,
+        [savedItemId, userId]
+      );
+    }
+
+
+    res.status(200).json({ success: true, message: "Saved item updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update saved item", details: err });
+  }
+};
+
 
 // Get all users
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -166,7 +295,7 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 
 // Get user by ID
 export const getUserById = async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
-  const id = parseInt(req.params.id, 10);
+  const id = req.cookies.userId;
 
   if (isNaN(id)) {
     return res.status(400).json({ error: 'Invalid user ID' });
