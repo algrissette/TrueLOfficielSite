@@ -317,3 +317,8 @@ export const getUserById = async (req: Request<{ id: string }>, res: Response, n
     res.status(500).json({ error: 'Database error' });
   }
 };
+
+
+export const updateEmail = () => {
+
+}

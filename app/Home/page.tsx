@@ -7,16 +7,13 @@ import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
 
 export default function Home() {
-
-
   const animationBar = useRef<HTMLDivElement>(null);
   const container = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
 
-
   const image1 = useRef<HTMLImageElement>(null);
   const image2 = useRef<HTMLImageElement>(null);
-  const [isVisibile, setIsVisible] = useState(false)
+  const [isVisibile, setIsVisible] = useState(false);
 
   // fashionWords.ts
   const wordList: string[] = [
@@ -32,7 +29,7 @@ export default function Home() {
     "Frame",       // 9
     "Spark",       // 10
     "Pulse",       // 11
-    "Truc",       // 12 - middle word
+    "Truc",        // 12 - middle word
     "Loom",        // 13
     "Wander",      // 14
     "Twist",       // 15
@@ -44,9 +41,8 @@ export default function Home() {
     "Take",        // 21
     "Plan",        // 22
     "Alleviate",   // 23
-    "Paint",       // 24
+    // 24
   ];
-
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -108,38 +104,43 @@ export default function Home() {
     return () => observer.disconnect(); // cleanup
   }, []);
 
-
-
-
-
   return (
     <div className="maindiv">
       {/* Video section */}
       <div className="overflow-x-hidden w-full h-[100dvh]">
         <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-10">
-          <h1 className="text-9xl font-edwardian text-black drop-shadow-2xl">Trucé L'Officiel</h1>
+          <h1 className="text-5xl sm:text-7xl lg:text-9xl font-edwardian text-black drop-shadow-2xl text-center px-4">
+            Trucé L'Officiel
+          </h1>
 
           {/* Animated particles */}
-          <div className="relative h-[30px] w-[600px] flex items-center justify-around gap-2">
-            <div className="w-3 h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFE735] rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
-            <div className="w-3 h-3 bg-[#F594FE] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            <div className="w-3 h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
-            <div className="w-3 h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '500ms' }}></div>
+          <div className="relative h-[30px] w-full max-w-[600px] mx-auto flex items-center justify-around gap-2">
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#FFE735] rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#F594FE] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '500ms' }}></div>
           </div>
         </div>
 
-        <video className="w-full h-[100dvh] object-cover"
-          width="100%" height="100%" autoPlay muted loop>
+        <video
+          className="w-full h-[100dvh] object-cover"
+          width="100%"
+          height="100%"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
           <source src="/Media/Videos/IntroductionVideo.mp4" type="video/mp4" />
         </video>
       </div>
 
       <NavBar font="sans" color="#ffffff" />
 
-      {/* Image reveal section */}
-      <div className="imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] sm:hidden md:block relative">
+      {/* Image reveal section - HIDDEN ON SMALL AND MEDIUM SCREENS */}
+      <div className="imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] hidden lg:block relative">
         {/* Base layer images */}
         <div className="flex justify-between items-start">
           <div className="aspect-square w-[40%] relative overflow-hidden border-6 border-black">
@@ -150,7 +151,7 @@ export default function Home() {
             <img className="w-full h-full object-cover" src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
           </div>
 
-          <div ref={animationBar} className="w-2 h-[727px] relative bottom-3 rounded-full bg-[#00FF44] border-1 border-[#46B8FF] shadow-lg z-1"></div>
+          <div ref={animationBar} className="w-2 h-[727px] relative bottom-3 rounded-full bg-black border-1 border-white shadow-lg z-1"></div>
         </div>
 
         {/* Overlay layer images (reveal effect) */}
@@ -173,21 +174,22 @@ export default function Home() {
           ref={container}
           className="
           wordEffect
-          pl-[5%]
-          h-[100svh]
+          pl-[3%] sm:pl-[5%] lg:pl-[7%]
+          h-[150svh]
           perspective-[1000px]
           [transform-style:preserve-3d]
           grid
           grid-rows-[repeat(4,25dvh)]
           grid-cols-[repeat(4,25dvw)]
           sticky
+          relative
           top-0
           overflow-clip 
           bg-black
         "
         >
           {wordList.map((word, key) => {
-            const fontSize = 75 + Math.random() * 30;
+            const fontSize = 50 + Math.random() * 30;
             const colors = ["#F594FE", "#FF3333", "#FFE735", "#4C9AFF"];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
@@ -199,7 +201,7 @@ export default function Home() {
                   fontSize: `${fontSize}px`,
                   fontFamily: "Edwardian Script ITC",
                   color: randomColor,
-                  animationDelay: `${Math.random() * 2}s`
+                  animationDelay: `${Math.random() * 2}s`,
                 }}
               >
                 {word}
@@ -208,9 +210,9 @@ export default function Home() {
           })}
         </div>
 
-        <div className="flex justify-end relative py-60 px-20 ">
-          <h1 className="font-edwardian text-8xl text-red-500 animate-pulse">
-            <a href="/Home">Visit Shop</a>
+        <div className="bg-black flex justify-center lg:justify-end relative h-20 py-40 sm:py-10 lg:py-20 px-4 sm:px-10 lg:px-20">
+          <h1 className=" bg-white font-edwardian text-4xl sm:text-6xl lg:text-8xl text-red-500 animate-pulse">
+            <a href="/What">Visit Shop</a>
           </h1>
         </div>
       </div>

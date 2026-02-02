@@ -10,6 +10,8 @@ export type Products = {
 export type ProductEdge = {
     cursor: string
     node: ProductNode
+
+
 }
 
 export type ProductNode = {
@@ -22,6 +24,7 @@ export type ProductNode = {
     updatedAt: string
     options: ProductOption[]
     variants: Variants
+
 }
 
 export type ProductOption = {
@@ -43,16 +46,16 @@ export type VariantNode = {
     title: string
     availableForSale: boolean
     barcode: string
-    compareAtPrice: string
+    compareAtPrice: string      // ✅ Already correct
     createdAt: string
-    price: number
-    selectedOptions: OptionType[]
+    price: string               // ✅ Change from number to string
+    selectedOptions: {
+        name: string;
+        value: string;
+    }[]
+    product: { id: string, title: string }
+}
 
-}
-export type OptionType = {
-    name: string
-    value: string
-}
 
 export type Image = {
     url: string
@@ -69,9 +72,9 @@ export type ProductNodeSimple = {
 }
 
 export type ProductLite = {
-    id: string
-    title: string
-    desciption: string
+    id: string,
+    title: string,
+    description: string
     variants: VariantsLite
 }
 
@@ -94,7 +97,12 @@ export type ProductVariant = {
     availableForSale: boolean
     price: MoneyForm
     compareAtPrice?: MoneyForm | null
-    image?: { id: string; altText?: string | null; url: string } | null
+    image?: { id: string; altText?: string | null; url: string } | null,
+    selectedOptions: {
+        name: string,
+        value: string
+    }[]
+    product: ProductNode
 }
 
 export type CartEdges = {
@@ -111,6 +119,7 @@ export type CartLine = {
     id: string
     quantity: number
     merchandise: ProductVariant
+    cost: CartCost
 }
 
 export type CartCost = {

@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         edwardian: ['"Edwardian Script ITC"', 'cursive'],
+        gfsDot: ["GFS-Dot", "regular"]
       },
       height: {
         '210': '840px',

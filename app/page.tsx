@@ -1,16 +1,7 @@
-import NavBar from "@/components/navbar/navbar";
+"use client";
 
-export default function Home() {
-  return (
+import { redirect } from "next/navigation";
 
-    
-
-
-    <NavBar
-    font= "sans"
-    color="#ffffff"
-    />
-
-      
-  );
+export default function Page() {
+  redirect("/Home");
 }

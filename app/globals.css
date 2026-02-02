@@ -7,12 +7,23 @@
   --background: #ffffff;
   --foreground: #171717;
   --font-edwardian: "Edwardian Script ITC";
+  --font-gfsdot: "GFS-Dot"
 }
 
 /* Font-face */
 @font-face {
   font-family: "Edwardian Script ITC";
   src: url("/fonts/edwardianscriptitc.ttf");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* Font-face */
+@font-face {
+  font-family: "GFS-Dot";
+  src: url("/fonts/GFSDidot-Regular.ttf");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -27,30 +38,19 @@
   }
 
   50% {
-    transform: translateZ(0px);
+    transform: translateZ(1000);
     opacity: 1;
     filter: blur(0px);
   }
 
   100% {
-    transform: translateZ(1000px);
+    transform: translateZ(0);
     opacity: 0;
     filter: blur(5px);
   }
 }
 
-@keyframes blink-back {
-  0% {
-    transform: translateZ(0px);
-    opacity: 0;
-  }
 
-  100% {
-    transform: translateZ(0px);
-    opacity: 1;
-    filter: blur(0px);
-  }
-}
 
 /* Custom cursor animations */
 @keyframes sparkle {
@@ -97,7 +97,7 @@
 /* Animation trigger class */
 .animate-zoom-in {
   animation:
-    zoom-in 2s ease-out,
+    zoom-in 5s ease-out,
     blink-back 0.3s ease-out 2s forwards;
   will-change: transform, opacity, filter;
 }
@@ -120,7 +120,7 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-gfsdot), Helvetica, sans-serif;
   cursor: none;
   /* Hide default cursor */
 }

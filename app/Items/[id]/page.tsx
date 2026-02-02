@@ -7,6 +7,7 @@ import Footer from "@/components/footer/footer";
 import { useSearchParams, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CiHeart } from "react-icons/ci";
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function ItemPage() {
     const params = useParams();
@@ -125,6 +126,73 @@ export default function ItemPage() {
         setSizes(Array.from(new Set(sizes)));
     }, [product, variant]);
 
+
+
+    // ===== Fetch Cart Lines =====
+    const fetchCart = () => {
+        const cartID = sessionStorage.getItem("cartID")
+        if (!cartID) { return null }
+
+        else { return cartID }
+    }
+
+    // ===== Add to Cart =====
+    const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        const cartID = fetchCart()
+        console.log(cartID)
+
+        const variantId = variant?.id
+        console.log(variantId)
+        if (!variantId) return
+
+        try {
+            if (!cartID) {
+                console.log("Creating new cart")
+                const { data } = await api.post("/cart/createCart", {
+                    input: { lines: [{ merchandiseId: variantId, quantity: 1 }] },
+                })
+                sessionStorage.setItem("cartID", data.data.data.cartCreate.cart.id)
+                toast.success("Added to cart!")
+            } else {
+                const { data } = await api.post("/cart/addToCart", {
+                    cartId: cartID,
+                    lines: [{ merchandiseId: variantId, quantity: 1 }],
+                })
+                console.log(data)
+                toast.success("Added to cart!")
+            }
+        } catch (err) {
+            console.error(err)
+            toast.error("Failed to add to cart")
+        }
+    }
+
+    // ===== Save to Wishlist =====
+    const handleSaveToWishlist = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+
+        const variantId = variant?.id
+        if (!variantId) {
+            toast.error("No product selected")
+            return
+        }
+
+        try {
+            await api.post("/users/saveItemInDatabase", {
+                variantId: variantId,
+            })
+
+            console.log("Item saved to wishlist!")
+            toast.success("Added to wishlist! ❤️")
+        } catch (error: any) {
+            console.error("Error saving to wishlist:", error)
+            const errorMsg = error.response?.data?.message || "Failed to add to wishlist"
+            toast.error(errorMsg)
+        }
+    }
+
+
     if (loading) {
         return (
             <div className="min-h-screen bg-black">
@@ -152,176 +220,203 @@ export default function ItemPage() {
     }
 
     return (
-        <div className="min-h-screen bg-black">
-            <NavBar font="sans" color="#ffffff" />
+        <>
+            <Toaster
+                position="top-right"
+                toastOptions={{
+                    duration: 3000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                    },
+                    success: {
+                        style: {
+                            background: '#10b981',
+                        },
+                    },
+                    error: {
+                        style: {
+                            background: '#ef4444',
+                        },
+                    },
+                }}
+            />
 
-            <div className="max-w-[1800px] mx-auto px-6 py-8">
-                <div className="flex gap-8">
-                    {/* Images Section - 70% width, interactive zoom like WithJean */}
-                    <div className="w-[70%] grid grid-cols-2 gap-3">
-                        {allImages.map((item, index) => (
-                            <div
-                                key={index}
-                                className="relative aspect-[3/4] overflow-hidden bg-black group cursor-crosshair"
-                            >
-                                <img
-                                    src={item}
-                                    alt={`${product?.title} - ${index + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-150"
-                                    onMouseMove={(e) => {
-                                        const rect = e.currentTarget.getBoundingClientRect();
-                                        const x = ((e.clientX - rect.left) / rect.width) * 100;
-                                        const y = ((e.clientY - rect.top) / rect.height) * 100;
-                                        e.currentTarget.style.transformOrigin = `${x}% ${y}%`;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.transformOrigin = 'center center';
-                                    }}
-                                />
-                                {/* Minimal border */}
-                                <div className="absolute inset-0 border border-gray-900 pointer-events-none"></div>
+            <div className="min-h-screen bg-black">
+                <NavBar font="sans" color="#ffffff" />
+
+                <div className="max-w-[1800px] mx-auto px-6 py-8">
+                    <div className="flex gap-8">
+                        {/* Images Section - 70% width, interactive zoom like WithJean */}
+                        <div className="w-[70%] grid grid-cols-2 gap-3">
+                            {allImages.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="relative aspect-[3/4] overflow-hidden bg-black group cursor-crosshair"
+                                >
+                                    <img
+                                        src={item}
+                                        alt={`${product?.title} - ${index + 1}`}
+                                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-150"
+                                        onMouseMove={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            const x = ((e.clientX - rect.left) / rect.width) * 100;
+                                            const y = ((e.clientY - rect.top) / rect.height) * 100;
+                                            e.currentTarget.style.transformOrigin = `${x}% ${y}%`;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transformOrigin = 'center center';
+                                        }}
+                                    />
+                                    {/* Minimal border */}
+                                    <div className="absolute inset-0 border border-gray-900 pointer-events-none"></div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Product Info Section - 30% width, sticky */}
+                        <div className="w-[30%] space-y-6 sticky top-24 h-fit">
+                            {/* Title */}
+                            <div className="space-y-3">
+                                <h1 className="text-3xl font-bold text-white tracking-tight">
+                                    {product?.title}
+                                </h1>
+
+                                {/* Gradient line */}
+                                <div className="w-16 h-0.5 bg-gradient-to-r from-[#4C9AFF] via-[#FF3333] to-[#FFE735]"></div>
+
+                                {variant?.price && (
+                                    <p className="text-2xl font-bold text-white">
+                                        ${variant.price}
+                                    </p>
+                                )}
                             </div>
-                        ))}
-                    </div>
 
-                    {/* Product Info Section - 30% width, sticky */}
-                    <div className="w-[30%] space-y-6 sticky top-24 h-fit">
-                        {/* Title */}
-                        <div className="space-y-3">
-                            <h1 className="text-3xl font-bold text-white tracking-tight">
-                                {product?.title}
-                            </h1>
-
-                            {/* Gradient line */}
-                            <div className="w-16 h-0.5 bg-gradient-to-r from-[#4C9AFF] via-[#FF3333] to-[#FFE735]"></div>
-
-                            {variant?.price && (
-                                <p className="text-2xl font-bold text-white">
-                                    ${variant.price}
+                            {/* Description */}
+                            {product?.description && (
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    {product.description}
                                 </p>
                             )}
-                        </div>
 
-                        {/* Description */}
-                        {product?.desciption && (
-                            <p className="text-gray-400 text-sm leading-relaxed">
-                                {product.desciption}
-                            </p>
-                        )}
+                            {/* Color Selection - Stars */}
+                            {allColors.length > 0 && (
+                                <div className="space-y-3">
+                                    <h3 className="text-xs font-bold text-white tracking-widest uppercase">
+                                        Color
+                                    </h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {allColors.map((color) => {
+                                            const hexColor = getColorHex(color);
+                                            const isSelected = selectedColor === color;
 
-                        {/* Color Selection - Stars */}
-                        {allColors.length > 0 && (
-                            <div className="space-y-3">
-                                <h3 className="text-xs font-bold text-white tracking-widest uppercase">
-                                    Color
-                                </h3>
-                                <div className="flex flex-wrap gap-3">
-                                    {allColors.map((color) => {
-                                        const hexColor = getColorHex(color);
-                                        const isSelected = selectedColor === color;
-
-                                        return (
-                                            <button
-                                                key={color}
-                                                onClick={() => setSelectedColor(color)}
-                                                className="group relative flex flex-col items-center gap-1"
-                                                title={color}
-                                            >
-                                                {/* Star */}
-                                                <div className={`relative transition-transform duration-300 ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`}>
-                                                    <svg
-                                                        width="32"
-                                                        height="32"
-                                                        viewBox="0 0 24 24"
-                                                        className="drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
-                                                    >
-                                                        <path
-                                                            d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"
-                                                            fill={hexColor}
-                                                            stroke={isSelected ? '#FFFFFF' : hexColor}
-                                                            strokeWidth={isSelected ? '1' : '0'}
-                                                        />
-                                                    </svg>
-                                                    {/* Glow when selected */}
-                                                    {isSelected && (
-                                                        <div
-                                                            className="absolute inset-0 blur-lg animate-pulse"
-                                                            style={{
-                                                                backgroundColor: hexColor,
-                                                                opacity: 0.4
-                                                            }}
-                                                        ></div>
-                                                    )}
-                                                </div>
-                                                {/* Color name */}
-                                                <span className={`text-[10px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'
-                                                    }`}>
-                                                    {color}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
+                                            return (
+                                                <button
+                                                    key={color}
+                                                    onClick={() => setSelectedColor(color)}
+                                                    className="group relative flex flex-col items-center gap-1"
+                                                    title={color}
+                                                >
+                                                    {/* Star */}
+                                                    <div className={`relative transition-transform duration-300 ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`}>
+                                                        <svg
+                                                            width="32"
+                                                            height="32"
+                                                            viewBox="0 0 24 24"
+                                                            className="drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                                        >
+                                                            <path
+                                                                d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"
+                                                                fill={hexColor}
+                                                                stroke={isSelected ? '#FFFFFF' : hexColor}
+                                                                strokeWidth={isSelected ? '1' : '0'}
+                                                            />
+                                                        </svg>
+                                                        {/* Glow when selected */}
+                                                        {isSelected && (
+                                                            <div
+                                                                className="absolute inset-0 blur-lg animate-pulse"
+                                                                style={{
+                                                                    backgroundColor: hexColor,
+                                                                    opacity: 0.4
+                                                                }}
+                                                            ></div>
+                                                        )}
+                                                    </div>
+                                                    {/* Color name */}
+                                                    <span className={`text-[10px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'
+                                                        }`}>
+                                                        {color}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Size Selection */}
-                        {allSizes.length > 0 && (
-                            <div className="space-y-3">
-                                <h3 className="text-xs font-bold text-white tracking-widest uppercase">
-                                    Size
-                                </h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {allSizes.map((size) => (
-                                        <button
-                                            key={size}
-                                            onClick={() => setSelectedSize(size)}
-                                            className={`px-5 py-2 border-2 text-sm font-semibold transition-all duration-300 ${selectedSize === size
+                            {/* Size Selection */}
+                            {allSizes.length > 0 && (
+                                <div className="space-y-3">
+                                    <h3 className="text-xs font-bold text-white tracking-widest uppercase">
+                                        Size
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {allSizes.map((size) => (
+                                            <button
+                                                key={size}
+                                                onClick={() => setSelectedSize(size)}
+                                                className={`px-5 py-2 border-2 text-sm font-semibold transition-all duration-300 ${selectedSize === size
                                                     ? 'border-[#4C9AFF] bg-[#4C9AFF]/20 text-white shadow-[0_0_15px_rgba(76,154,255,0.4)]'
                                                     : 'border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white'
-                                                }`}
-                                        >
-                                            {size}
-                                        </button>
-                                    ))}
+                                                    }`}
+                                            >
+                                                {size}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
+
+                            {/* Stock Status */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-gray-900">
+                                <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${variant?.availableForSale ? 'bg-[#2ECC71]' : 'bg-[#FF3333]'}`}></div>
+                                <p className={`text-xs font-semibold tracking-wide ${variant?.availableForSale ? 'text-[#2ECC71]' : 'text-[#FF3333]'}`}>
+                                    {variant?.availableForSale ? 'IN STOCK' : 'OUT OF STOCK'}
+                                </p>
                             </div>
-                        )}
 
-                        {/* Stock Status */}
-                        <div className="flex items-center gap-2 pt-2 border-t border-gray-900">
-                            <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${variant?.availableForSale ? 'bg-[#2ECC71]' : 'bg-[#FF3333]'}`}></div>
-                            <p className={`text-xs font-semibold tracking-wide ${variant?.availableForSale ? 'text-[#2ECC71]' : 'text-[#FF3333]'}`}>
-                                {variant?.availableForSale ? 'IN STOCK' : 'OUT OF STOCK'}
-                            </p>
-                        </div>
+                            {/* Action Buttons */}
+                            <div className="space-y-2 pt-4">
+                                <button
+                                    className="w-full bg-white text-black py-3 text-sm font-bold hover:bg-gray-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!variant?.availableForSale}
+                                    onClick={(event) => { handleAddToCart(event) }}
+                                >
+                                    Add to Cart
+                                </button>
 
-                        {/* Action Buttons */}
-                        <div className="space-y-2 pt-4">
-                            <button
-                                className="w-full bg-white text-black py-3 text-sm font-bold hover:bg-gray-200 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={!variant?.availableForSale}
-                            >
-                                Add to Cart
-                            </button>
+                                <button
+                                    className="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-700 text-sm font-bold text-white hover:border-[#FF3333] hover:bg-[#FF3333]/10 transition-all duration-300 group"
+                                    onClick={(event) => { handleSaveToWishlist(event) }}
+                                >
+                                    <CiHeart className="text-lg group-hover:text-[#FF3333] transition-colors duration-300" />
+                                    <span>Wishlist</span>
+                                </button>
+                            </div>
 
-                            <button className="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-700 text-sm font-bold text-white hover:border-[#FF3333] hover:bg-[#FF3333]/10 transition-all duration-300 group">
-                                <CiHeart className="text-lg group-hover:text-[#FF3333] transition-colors duration-300" />
-                                <span>Wishlist</span>
-                            </button>
-                        </div>
-
-                        {/* Cosmic dots */}
-                        <div className="flex justify-center gap-1.5 pt-6">
-                            <div className="w-1 h-1 bg-[#4C9AFF] rounded-full animate-pulse"></div>
-                            <div className="w-1 h-1 bg-[#FF3333] rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-                            <div className="w-1 h-1 bg-[#FFE735] rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+                            {/* Cosmic dots */}
+                            <div className="flex justify-center gap-1.5 pt-6">
+                                <div className="w-1 h-1 bg-[#4C9AFF] rounded-full animate-pulse"></div>
+                                <div className="w-1 h-1 bg-[#FF3333] rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                                <div className="w-1 h-1 bg-[#FFE735] rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <Footer />
-        </div>
+                <Footer />
+            </div>
+        </>
     );
 }
