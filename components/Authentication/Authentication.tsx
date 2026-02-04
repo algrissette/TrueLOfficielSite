@@ -66,7 +66,7 @@ export default function Authentication({ signUp }: { signUp: boolean }) {
       // Redirect after short delay
       setTimeout(() => {
 
-        redirect("/Home");
+        window.location.href = '/';
       }, 1500);
 
     } catch (error: any) {
@@ -164,7 +164,7 @@ export default function Authentication({ signUp }: { signUp: boolean }) {
 
       // Redirect to login after short delay
       setTimeout(() => {
-        redirect("/Authentication/Login");
+        window.location.href = '/';
       }, 2000);
 
     } catch (error: any) {

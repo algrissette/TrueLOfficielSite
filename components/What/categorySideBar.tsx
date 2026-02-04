@@ -6,6 +6,7 @@ import { Products, ProductNode } from "@/app/util/datatypes";
 import { MdArrowDropDown } from "react-icons/md";
 import { useRouter } from 'next/navigation';
 import { useParams, useSearchParams } from "next/navigation";
+import { HiFilter } from "react-icons/hi";
 
 type CategoryOption = {
     name: string;
@@ -18,6 +19,7 @@ export default function CategorySideBar() {
     const [categories, setCategories] = useState<CategoryOption[]>([]);
     const [openCategory, setOpenCategory] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const { params } = useParams();
 
@@ -92,13 +94,25 @@ export default function CategorySideBar() {
         fetchProducts();
     }, []);
 
+    // Close mobile filters when clicking outside
+    useEffect(() => {
+        if (mobileFiltersOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [mobileFiltersOpen]);
+
     console.log("Rendering CategorySideBar, products:", products);
     console.log("Rendering CategorySideBar, categories:", categories);
 
     if (loading) {
         return (
             <div className="sticky top-0 z-30 backdrop-blur-xl bg-black border-b border-white/10">
-                <div className="flex items-center justify-center h-20 px-6">
+                <div className="flex items-center justify-center h-16 lg:h-20 px-6">
                     <div className="flex gap-2">
                         <div className="w-2 h-2 bg-[#4C9AFF] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                         <div className="w-2 h-2 bg-[#FF3333] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -112,132 +126,292 @@ export default function CategorySideBar() {
     if (categories.length === 0) {
         return (
             <div className="sticky top-0 z-30 backdrop-blur-xl bg-black border-b border-white/10">
-                <div className="flex items-center justify-center h-20 px-6">
+                <div className="flex items-center justify-center h-16 lg:h-20 px-6">
                     <p className="text-white/60 text-sm font-light">No categories available</p>
                 </div>
             </div>
         );
     }
 
+    const activeFilterCount = categories.reduce((count, cat) => {
+        return count + searchParams.getAll(cat.name).length;
+    }, 0);
+
     return (
-        <div className="sticky top-0 z-30 backdrop-blur-xl bg-black border-b border-white/10 shadow-2xl pt-16">
-            <div className="flex items-stretch justify-center gap-1 px-6 h-20">
-                {categories.map((item, idx) => {
-                    const isOpen = openCategory === item.name;
-                    const accentColors = ['#4C9AFF', '#FF3333', '#FFE735', '#F594FE'];
-                    const accentColor = accentColors[idx % accentColors.length];
+        <>
+            {/* DESKTOP VERSION - Hidden on mobile */}
+            <div className="hidden lg:block sticky top-0 z-30 backdrop-blur-xl bg-black border-b border-white/10 shadow-2xl pt-16">
+                <div className="flex items-stretch justify-center gap-1 px-6 h-20">
+                    {categories.map((item, idx) => {
+                        const isOpen = openCategory === item.name;
+                        const accentColors = ['#4C9AFF', '#FF3333', '#FFE735', '#F594FE'];
+                        const accentColor = accentColors[idx % accentColors.length];
 
-                    return (
-                        <div
-                            key={item.name}
-                            className="relative group"
-                            style={{ animationDelay: `${idx * 100}ms` }}
-                        >
-                            {/* HEADER BUTTON */}
-                            <button
-                                type="button"
-                                onClick={() => handleShowMenuItems(item.name)}
-                                className="relative flex items-center justify-between w-44 h-20 px-6 text-sm font-medium text-white/90 hover:text-white transition-all duration-300 overflow-hidden"
-                            >
-                                {/* Hover background effect */}
-                                <div
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    style={{
-                                        background: `linear-gradient(135deg, ${accentColor}15 0%, transparent 100%)`
-                                    }}
-                                ></div>
-
-                                {/* Active indicator line */}
-                                <div
-                                    className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ${isOpen ? 'w-full' : 'w-0 group-hover:w-full'
-                                        }`}
-                                    style={{ backgroundColor: accentColor }}
-                                ></div>
-
-                                <span className="relative z-10 tracking-wider uppercase text-xs font-semibold">
-                                    {item.name}
-                                </span>
-
-                                <MdArrowDropDown
-                                    className={`relative z-10 h-5 w-5 transition-all duration-500 ${isOpen ? "rotate-180" : "rotate-0"
-                                        }`}
-                                    style={{ color: isOpen ? accentColor : 'currentColor' }}
-                                />
-                            </button>
-
-                            {/* DROPDOWN MENU */}
+                        return (
                             <div
-                                className={`absolute left-0 top-full w-64 bg-black/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-500 ease-out ${isOpen
-                                    ? 'opacity-100 translate-y-2 '
-                                    : 'opacity-0 -translate-y-4 pointer-events-none max-h-0'
-                                    }`}
-                                style={{
-                                    borderTopColor: accentColor,
-                                    borderTopWidth: '10px'
-                                }}
+                                key={item.name}
+                                className="relative group"
+                                style={{ animationDelay: `${idx * 100}ms` }}
                             >
-                                <div className="p-4 space-y-1 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                                    {item.values.map((v, vIdx) => {
-                                        const isChecked = searchParams.getAll(item.name).includes(v);
+                                {/* HEADER BUTTON */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleShowMenuItems(item.name)}
+                                    className="relative flex items-center justify-between w-44 h-20 px-6 text-sm font-medium text-white/90 hover:text-white transition-all duration-300 overflow-hidden"
+                                >
+                                    {/* Hover background effect */}
+                                    <div
+                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        style={{
+                                            background: `linear-gradient(135deg, ${accentColor}15 0%, transparent 100%)`
+                                        }}
+                                    ></div>
 
-                                        return (
-                                            <label
-                                                key={v}
-                                                className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 cursor-pointer group/item"
-                                                style={{
-                                                    animationDelay: `${vIdx * 50}ms`
-                                                }}
-                                            >
-                                                {/* Custom Checkbox */}
-                                                <div className="relative">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="peer sr-only"
-                                                        checked={isChecked}
-                                                        onChange={(e) => filterForCategory(e, item, v)}
-                                                    />
-                                                    <div
-                                                        className="w-5 h-5 border-2 border-white/30 rounded transition-all duration-300 peer-checked:border-0"
-                                                        style={{
-                                                            backgroundColor: isChecked ? accentColor : 'transparent'
-                                                        }}
-                                                    >
-                                                        {isChecked && (
-                                                            <svg
-                                                                className="w-full h-full text-black p-0.5"
-                                                                fill="none"
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="3"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                            >
-                                                                <path d="M5 13l4 4L19 7"></path>
-                                                            </svg>
-                                                        )}
+                                    {/* Active indicator line */}
+                                    <div
+                                        className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 ${isOpen ? 'w-full' : 'w-0 group-hover:w-full'
+                                            }`}
+                                        style={{ backgroundColor: accentColor }}
+                                    ></div>
+
+                                    <span className="relative z-10 tracking-wider uppercase text-xs font-semibold">
+                                        {item.name}
+                                    </span>
+
+                                    <MdArrowDropDown
+                                        className={`relative z-10 h-5 w-5 transition-all duration-500 ${isOpen ? "rotate-180" : "rotate-0"
+                                            }`}
+                                        style={{ color: isOpen ? accentColor : 'currentColor' }}
+                                    />
+                                </button>
+
+                                {/* DROPDOWN MENU */}
+                                <div
+                                    className={`absolute left-0 top-full w-64 bg-black/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-500 ease-out ${isOpen
+                                        ? 'opacity-100 translate-y-2'
+                                        : 'opacity-0 -translate-y-4 pointer-events-none max-h-0'
+                                        }`}
+                                    style={{
+                                        borderTopColor: accentColor,
+                                        borderTopWidth: '2px'
+                                    }}
+                                >
+                                    <div className="p-4 space-y-1 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                                        {item.values.map((v, vIdx) => {
+                                            const isChecked = searchParams.getAll(item.name).includes(v);
+
+                                            return (
+                                                <label
+                                                    key={v}
+                                                    className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 cursor-pointer group/item"
+                                                    style={{
+                                                        animationDelay: `${vIdx * 50}ms`
+                                                    }}
+                                                >
+                                                    {/* Custom Checkbox */}
+                                                    <div className="relative">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="peer sr-only"
+                                                            checked={isChecked}
+                                                            onChange={(e) => filterForCategory(e, item, v)}
+                                                        />
+                                                        <div
+                                                            className="w-5 h-5 border-2 border-white/30 rounded transition-all duration-300 peer-checked:border-0"
+                                                            style={{
+                                                                backgroundColor: isChecked ? accentColor : 'transparent'
+                                                            }}
+                                                        >
+                                                            {isChecked && (
+                                                                <svg
+                                                                    className="w-full h-full text-black p-0.5"
+                                                                    fill="none"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth="3"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke="currentColor"
+                                                                >
+                                                                    <path d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <span className="relative group-hover/item:translate-x-0.5 transition-transform duration-200">
-                                                    {v}
-                                                </span>
+                                                    <span className="relative group-hover/item:translate-x-0.5 transition-transform duration-200">
+                                                        {v}
+                                                    </span>
 
-                                                {/* Active pill indicator */}
-                                                {isChecked && (
-                                                    <div
-                                                        className="ml-auto w-1.5 h-1.5 rounded-full"
-                                                        style={{ backgroundColor: accentColor }}
-                                                    ></div>
-                                                )}
-                                            </label>
-                                        );
-                                    })}
+                                                    {/* Active pill indicator */}
+                                                    {isChecked && (
+                                                        <div
+                                                            className="ml-auto w-1.5 h-1.5 rounded-full"
+                                                            style={{ backgroundColor: accentColor }}
+                                                        ></div>
+                                                    )}
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+
+            {/* MOBILE VERSION - Visible on mobile only */}
+            <div className="lg:hidden sticky top-0 z-30 backdrop-blur-xl bg-black border-b border-white/10 shadow-2xl">
+                <div className="flex items-center justify-between h-16 px-4">
+                    <h2 className="text-white font-semibold text-sm tracking-wider">FILTERS</h2>
+                    <button
+                        onClick={() => setMobileFiltersOpen(true)}
+                        className="relative flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg transition-all duration-300"
+                    >
+                        <HiFilter className="text-white" size={18} />
+                        <span className="text-white text-sm font-medium">Filter</span>
+                        {activeFilterCount > 0 && (
+                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF3333] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                {activeFilterCount}
+                            </span>
+                        )}
+                    </button>
+                </div>
+            </div>
+
+            {/* MOBILE FILTER DRAWER */}
+            {mobileFiltersOpen && (
+                <div className="lg:hidden fixed inset-0 z-50">
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setMobileFiltersOpen(false)}
+                    ></div>
+
+                    {/* Drawer */}
+                    <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-black/95 backdrop-blur-xl border-l border-white/10 shadow-2xl overflow-hidden animate-slide-in-right">
+                        {/* Header */}
+                        <div className="sticky top-0 bg-black/95 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-white font-semibold text-lg tracking-wider">FILTERS</h2>
+                            <button
+                                onClick={() => setMobileFiltersOpen(false)}
+                                className="text-white/70 hover:text-white transition-colors"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Scrollable Content */}
+                        <div className="overflow-y-auto h-[calc(100vh-80px)] px-6 py-4">
+                            {categories.map((item, idx) => {
+                                const isOpen = openCategory === item.name;
+                                const accentColors = ['#4C9AFF', '#FF3333', '#FFE735', '#F594FE'];
+                                const accentColor = accentColors[idx % accentColors.length];
+
+                                return (
+                                    <div key={item.name} className="mb-4">
+                                        {/* Category Header */}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleShowMenuItems(item.name)}
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300"
+                                        >
+                                            <span className="text-white font-medium text-sm tracking-wider uppercase">
+                                                {item.name}
+                                            </span>
+                                            <MdArrowDropDown
+                                                className={`h-5 w-5 text-white transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
+                                                    }`}
+                                                style={{ color: isOpen ? accentColor : 'currentColor' }}
+                                            />
+                                        </button>
+
+                                        {/* Category Options */}
+                                        <div
+                                            className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 mt-2' : 'max-h-0'
+                                                }`}
+                                        >
+                                            <div className="space-y-1 px-2">
+                                                {item.values.map((v) => {
+                                                    const isChecked = searchParams.getAll(item.name).includes(v);
+
+                                                    return (
+                                                        <label
+                                                            key={v}
+                                                            className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 cursor-pointer"
+                                                        >
+                                                            {/* Custom Checkbox */}
+                                                            <div className="relative">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="peer sr-only"
+                                                                    checked={isChecked}
+                                                                    onChange={(e) => filterForCategory(e, item, v)}
+                                                                />
+                                                                <div
+                                                                    className="w-5 h-5 border-2 border-white/30 rounded transition-all duration-300 peer-checked:border-0"
+                                                                    style={{
+                                                                        backgroundColor: isChecked ? accentColor : 'transparent'
+                                                                    }}
+                                                                >
+                                                                    {isChecked && (
+                                                                        <svg
+                                                                            className="w-full h-full text-black p-0.5"
+                                                                            fill="none"
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth="3"
+                                                                            viewBox="0 0 24 24"
+                                                                            stroke="currentColor"
+                                                                        >
+                                                                            <path d="M5 13l4 4L19 7"></path>
+                                                                        </svg>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            <span className="flex-1">{v}</span>
+
+                                                            {/* Active pill indicator */}
+                                                            {isChecked && (
+                                                                <div
+                                                                    className="w-1.5 h-1.5 rounded-full"
+                                                                    style={{ backgroundColor: accentColor }}
+                                                                ></div>
+                                                            )}
+                                                        </label>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Footer - Clear/Apply Buttons */}
+                        <div className="sticky bottom-0 bg-black/95 backdrop-blur-xl border-t border-white/10 px-6 py-4 flex gap-3">
+                            <button
+                                onClick={() => {
+                                    router.push(window.location.pathname);
+                                    setMobileFiltersOpen(false);
+                                }}
+                                className="flex-1 px-4 py-3 border border-white/20 rounded-lg text-white text-sm font-medium hover:bg-white/5 transition-all duration-300"
+                            >
+                                Clear All
+                            </button>
+                            <button
+                                onClick={() => setMobileFiltersOpen(false)}
+                                className="flex-1 px-4 py-3 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-200 transition-all duration-300"
+                            >
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

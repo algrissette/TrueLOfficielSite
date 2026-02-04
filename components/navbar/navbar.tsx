@@ -322,6 +322,7 @@ export default function NavBar({ font, color }: navBarProps) {
                             {!authLoading && (
                                 isAuthenticated ? (
                                     <button
+                                        title="Log Out"
                                         onClick={handleLogout}
                                         className="relative group p-2 md:p-3 rounded-full transition-all duration-300"
                                         aria-label="Logout"
@@ -379,6 +380,7 @@ export default function NavBar({ font, color }: navBarProps) {
                                 ) : (
                                     <button
                                         onClick={handleLogin}
+                                        title="Log In"
                                         className="relative group p-2 md:p-3 rounded-full transition-all duration-300"
                                         aria-label="Login"
                                         onMouseEnter={() => setHoveredItem("Login")}
@@ -535,7 +537,7 @@ export default function NavBar({ font, color }: navBarProps) {
                                 {/* Mobile Login/Logout Button */}
                                 {!authLoading && (
                                     isAuthenticated ? (
-                                        <button
+                                        <button title="Log Out"
                                             onClick={handleLogout}
                                             className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300"
                                         >
@@ -548,6 +550,7 @@ export default function NavBar({ font, color }: navBarProps) {
                                         </button>
                                     ) : (
                                         <button
+                                            title="Log In"
                                             onClick={handleLogin}
                                             className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300"
                                         >

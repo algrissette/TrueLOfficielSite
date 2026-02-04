@@ -151,7 +151,7 @@ export default function Home() {
             <img className="w-full h-full object-cover" src="/Media/Images/Home/HomePhoto2.jpg" alt="Home" />
           </div>
 
-          <div ref={animationBar} className="w-2 h-[727px] relative bottom-3 rounded-full bg-black border-1 border-white shadow-lg z-1"></div>
+          <div ref={animationBar} className="w-2 h-[20vh] xs:h-[25vh] sm:h-[40vh] md:h-[35vh] lg:h-[45vh] xl:h-[60vh] 2xl:h-[727px] relative bottom-3 rounded-full bg-black border-1 border-white shadow-lg z-1"></div>
         </div>
 
         {/* Overlay layer images (reveal effect) */}
