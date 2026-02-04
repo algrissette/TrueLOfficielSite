@@ -32,7 +32,7 @@ export default function Who() {
                     <div className="flex flex-col items-center justify-center  gap-10 text-3xl font-light text-white tracking-[0.4em] select-none relative z-10">
                         <span className="transition-all duration-300 hover:text-white hover:tracking-[0.5em]">T</span>
                         <span className="transition-all duration-300 hover:text-white hover:tracking-[0.5em]">R</span>
-                        <span className="border-b-2 border-white/80 pb-1 transition-all duration-300 hover:text-white hover:tracking-[0.5em]">A</span>
+                        <span className="border-b-2 border-white/80 pl-[5px] transition-all duration-300 hover:text-white hover:tracking-[0.5em]">A</span>
                         <span className="transition-all duration-300 hover:text-white hover:tracking-[0.5em]">C</span>
                         <span className="transition-all duration-300 hover:text-white hover:tracking-[0.5em]">Y</span>
 

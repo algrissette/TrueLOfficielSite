@@ -137,7 +137,7 @@ export default function Home() {
         </video>
       </div>
 
-      <NavBar font="sans" color="#ffffff" />
+      <NavBar font="GFS-Dot" color="#ffffff" />
 
       {/* Image reveal section - HIDDEN ON SMALL AND MEDIUM SCREENS */}
       <div className="imageContainer mx-[8%] mt-0 pt-2 h-[100dvh] w-[92%] hidden lg:block relative">

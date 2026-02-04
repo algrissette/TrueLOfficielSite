@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getUserById, getAllUsers, createUser, signIn, getSavedItems, saveItemInDatabase, deleteSavedItem } from '../controllers/users';
+import { getUserById, getAllUsers, createUser, signIn, getSavedItems, saveItemInDatabase, deleteSavedItem, updatePassword, sendPasswordResetLink, resetPassword } from '../controllers/users';
 
 const router = Router()
 // GET all users (static path first)
@@ -20,5 +20,9 @@ router.post('/saveItemInDatabase', saveItemInDatabase)
 
 router.post('/removeSavedItem', deleteSavedItem)
 
+router.post('/updatePassword', updatePassword)
+
+router.post('/sendPasswordResetLink', sendPasswordResetLink);
+router.post('/resetPassword', resetPassword);
 
 export default router;

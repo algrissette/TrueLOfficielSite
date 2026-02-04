@@ -4,7 +4,7 @@ import { api } from "@/app/util/apicCall";
 import { ProductLite, VariantNode } from "@/app/util/datatypes";
 import NavBar from "@/components/navbar/navbar";
 import Footer from "@/components/footer/footer";
-import { useSearchParams, useParams } from "next/navigation";
+import { useSearchParams, useParams, useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CiHeart } from "react-icons/ci";
 import toast, { Toaster } from 'react-hot-toast';
@@ -12,6 +12,7 @@ import toast, { Toaster } from 'react-hot-toast';
 export default function ItemPage() {
     const params = useParams();
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     const rawProductId = searchParams.get("productId");
     const rawVariantId = searchParams.get("variantId");
@@ -52,6 +53,60 @@ export default function ItemPage() {
     const getColorHex = (colorName: string): string => {
         const lower = colorName.toLowerCase();
         return colorMap[lower] || '#FFFFFF';
+    };
+
+    // Find variant by selected options
+    const findVariantByOptions = (color: string, size: string | null): VariantNode | null => {
+        if (!product) return null;
+
+        return product.variants.nodes.find(v => {
+            const variantColor = v.selectedOptions?.find(o => o.name === "Color")?.value;
+            const variantSize = v.selectedOptions?.find(o => o.name === "Size")?.value;
+
+            const colorMatch = variantColor?.toLowerCase() === color.toLowerCase();
+            const sizeMatch = !size || variantSize?.toLowerCase() === size.toLowerCase();
+
+            return colorMatch && sizeMatch;
+        }) || null;
+    };
+
+    // Navigate to new variant
+    const navigateToVariant = (newVariant: VariantNode) => {
+        const newVariantId = newVariant.id.split("/").pop();
+        redirect(`/Items/item?productId=${rawProductId}&variantId=${newVariantId}`);
+    };
+
+    // Handle color selection
+    const handleColorChange = (color: string) => {
+        console.log('Color selected:', color);
+        console.log('Current size:', selectedSize);
+        const newVariant = findVariantByOptions(color, selectedSize);
+        console.log('Found variant:', newVariant);
+        if (newVariant) {
+            navigateToVariant(newVariant);
+        } else {
+            console.log('No variant found for this combination');
+            setSelectedColor(color);
+        }
+    };
+
+    // Handle size selection
+    const handleSizeChange = (size: string) => {
+        console.log('Size selected:', size);
+        console.log('Current color:', selectedColor);
+        if (selectedColor) {
+            const newVariant = findVariantByOptions(selectedColor, size);
+            console.log('Found variant:', newVariant);
+            if (newVariant) {
+                navigateToVariant(newVariant);
+            } else {
+                console.log('No variant found for this combination');
+                setSelectedSize(size);
+            }
+        } else {
+            console.log('No color selected yet');
+            setSelectedSize(size);
+        }
     };
 
     // Fetch product and variant
@@ -124,6 +179,10 @@ export default function ItemPage() {
             .map(v => v.selectedOptions?.find(o => o.name === "Size")?.value)
             .filter(Boolean) as string[];
         setSizes(Array.from(new Set(sizes)));
+
+        // Set selected size from current variant
+        const variantSize = variant.selectedOptions?.find(o => o.name === "Size")?.value;
+        setSelectedSize(variantSize || null);
     }, [product, variant]);
 
 
@@ -313,7 +372,7 @@ export default function ItemPage() {
                                             return (
                                                 <button
                                                     key={color}
-                                                    onClick={() => setSelectedColor(color)}
+                                                    onClick={() => handleColorChange(color)}
                                                     className="group relative flex flex-col items-center gap-1"
                                                     title={color}
                                                 >
@@ -365,7 +424,7 @@ export default function ItemPage() {
                                         {allSizes.map((size) => (
                                             <button
                                                 key={size}
-                                                onClick={() => setSelectedSize(size)}
+                                                onClick={() => handleSizeChange(size)}
                                                 className={`px-5 py-2 border-2 text-sm font-semibold transition-all duration-300 ${selectedSize === size
                                                     ? 'border-[#4C9AFF] bg-[#4C9AFF]/20 text-white shadow-[0_0_15px_rgba(76,154,255,0.4)]'
                                                     : 'border-gray-700 hover:border-gray-500 text-gray-400 hover:text-white'

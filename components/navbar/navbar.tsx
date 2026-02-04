@@ -4,7 +4,7 @@ import { CiHeart, CiLogin, CiLogout, CiShoppingCart, CiUser } from "react-icons/
 import { useState, useEffect } from "react";
 import { api } from "@/app/util/apicCall";
 import { CartLine } from "@/app/util/datatypes";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 type navBarProps = {
     font: string;
@@ -106,7 +106,7 @@ export default function NavBar({ font, color }: navBarProps) {
             setMobileMenuOpen(false);
 
             // Redirect to home
-            router.push("/");
+            redirect("/Home");
 
             // Optional: reload to clear all state
             window.location.reload();
@@ -117,7 +117,7 @@ export default function NavBar({ font, color }: navBarProps) {
 
     const handleLogin = () => {
         setMobileMenuOpen(false);
-        router.push("/Authentication/Login");
+        redirect("/Authentication/Login");
     };
 
     // Close mobile menu when resizing to desktop
@@ -192,7 +192,7 @@ export default function NavBar({ font, color }: navBarProps) {
                         </button>
 
                         {/* Left: Navigation Links - Desktop Only */}
-                        <ul className="hidden lg:flex gap-8" style={{ fontFamily: font }}>
+                        <ul className="hidden lg:flex gap-8" style={{ fontFamily: "GFS-Dot" }}>
                             {navItems.map((item, idx) => {
                                 const colors = ['#4C9AFF', '#FF3333', '#FFE735'];
                                 const starColor = colors[idx % colors.length];

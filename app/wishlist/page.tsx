@@ -124,6 +124,7 @@ export default function Wishlist() {
                 })
 
                 console.log(data)
+                window.location.reload()
 
 
             }

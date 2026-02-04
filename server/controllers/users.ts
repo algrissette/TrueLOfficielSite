@@ -5,6 +5,7 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import dotenv from 'dotenv'
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
+import { sendPasswordResetEmail } from '../util/email';
 const jwtPassword = process.env.JWTSECRETKEY
 
 
@@ -319,6 +320,122 @@ export const getUserById = async (req: Request<{ id: string }>, res: Response, n
 };
 
 
-export const updateEmail = () => {
+export const updatePassword = async (req: Request, res: Response) => {
+  console.log("starting");
 
-}
+  const userId = req.cookies.userId;
+  const newPassword = req.body.newPassword;
+
+  if (!checkPasswordCriteria(newPassword)) {
+    return res.status(400).json({ error: "Password did not meet criteria" });
+  }
+
+  try {
+    const password = await hashPassword(newPassword); // Add await here
+
+    await db.execute(
+      "UPDATE users SET PASSWORD = ? WHERE id = ?",
+      [password, userId]
+    );
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("DBBBBBBBB", err);
+    return res.status(500).json({ error: 'Database error' });
+  }
+};
+
+
+export const sendPasswordResetLink = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  try {
+    // Check if user exists
+    const [rows]: any = await db.execute(
+      "SELECT id FROM users WHERE email = ? LIMIT 1",
+      [email]
+    );
+
+    if (!rows.length) {
+      // Don't reveal if user exists or not for security
+      return res.status(200).json({
+        message: "If an account exists with this email, a reset link has been sent"
+      });
+    }
+
+    const userId = rows[0].id;
+
+    if (!jwtPassword) {
+      throw new Error("JWT secret not defined");
+    }
+
+    // Create a password reset token (valid for 15 minutes)
+    const resetToken = jwt.sign({ userId, purpose: "password-reset" }, jwtPassword, {
+      expiresIn: "15m"
+    });
+
+    // Send the email
+    await sendPasswordResetEmail(email, resetToken);
+
+    return res.status(200).json({
+      message: "If an account exists with this email, a reset link has been sent"
+    });
+
+  } catch (err) {
+    console.error("Password reset error:", err);
+    return res.status(500).json({ error: "Failed to process request" });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: "Token and new password are required" });
+  }
+
+  if (!checkPasswordCriteria(newPassword)) {
+    return res.status(400).json({ error: "Password must have 8 characters, 1 number and one capital" });
+  }
+
+  try {
+    if (!jwtPassword) {
+      throw new Error("JWT secret not defined");
+    }
+
+    // Verify the token
+    const decoded = jwt.verify(token, jwtPassword) as { userId: number; purpose: string };
+
+    if (decoded.purpose !== "password-reset") {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await db.execute(
+      "UPDATE users SET PASSWORD = ? WHERE id = ?",
+      [hashedPassword, decoded.userId]
+    );
+
+    return res.status(200).json({ message: "Password has been reset successfully" });
+
+  } catch (err) {
+    if (err instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ error: "Reset link has expired" });
+    }
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: "Invalid reset token" });
+    }
+    console.error("Reset password error:", err);
+    return res.status(500).json({ error: "Failed to reset password" });
+  }
+};

@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from 'react-hot-toast';
+import { redirect } from "next/navigation";
+
 
 // Axios instance for localhost backend
 const api = axios.create({
@@ -63,7 +65,8 @@ export default function Authentication({ signUp }: { signUp: boolean }) {
 
       // Redirect after short delay
       setTimeout(() => {
-        router.push("/Home");
+
+        redirect("/Home");
       }, 1500);
 
     } catch (error: any) {
@@ -161,7 +164,7 @@ export default function Authentication({ signUp }: { signUp: boolean }) {
 
       // Redirect to login after short delay
       setTimeout(() => {
-        router.push("/Authentication/Login");
+        redirect("/Authentication/Login");
       }, 2000);
 
     } catch (error: any) {
